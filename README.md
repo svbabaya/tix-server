@@ -91,3 +91,9 @@ In project dir .<camera-ip>-var_log_messages*.txt
 
 # NTP server
 $ ntpdate -q 194.190.168.1
+
+# Install jq and view json in cli
+Use curl -s http://169.254.211.121:8085 | jq
+
+# Where is the camera name:
+/etc/sysconfig/brand.conf

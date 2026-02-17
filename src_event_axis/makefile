@@ -2,8 +2,8 @@ AXIS_USABLE_LIBS = UCLIBC GLIBC
 include $(AXIS_TOP_DIR)/tools/build/rules/common.mak
 
 # Парсинг данных из package.conf
-APP_NAME := $(shell grep "APPNAME" package.conf | cut -d'=' -f2 | tr -d '"')
-APP_VER  := $(shell grep "APPMAJORVERSION" package.conf | cut -d'=' -f2 | tr -d '"').$(shell grep "APPMINORVERSION" package.conf | cut -d'=' -f2 | tr -d '"')
+APP_NAME := $(shell grep "MENUNAME" package.conf | cut -d'=' -f2 | tr -d '"')
+APP_VER  := $(shell grep "APPMAJORVERSION" package.conf | cut -d'=' -f2 | tr -d '"').$(shell grep "APPMINORVERSION" package.conf | cut -d'=' -f2 | tr -d '"').$(shell grep "APPMICROVERSION" package.conf | cut -d'=' -f2 | tr -d '"')
 APP_DEFS  = -DAPP_NAME_STR=\"$(APP_NAME)\" -DAPP_VER_STR=\"$(APP_VER)\"
 
 # Настройки кросс-компиляции

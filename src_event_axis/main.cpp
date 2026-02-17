@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
-#include <string.h>
 
 #include "camera_info.hpp"
 
@@ -19,8 +18,7 @@ void request_handler(struct evhttp_request *req, void *arg) {
 
     // 1. Собираем данные через ваш C++ класс
     CameraInfo info = InfoCollector::collect();
-    std::string jsonResponse = info.toJson();
-
+    std::string jsonResponse = info.toJson() + "\n";
     struct evbuffer *buf = evbuffer_new();
     if (!buf) return;
 

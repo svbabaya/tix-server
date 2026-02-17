@@ -1,40 +1,58 @@
 #include "camera_info.hpp"
+
 #include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <ctime>
 #include <vector>
+#include <cstring>
+#include <string>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <unistd.h>
+#include <syslog.h>
+#include <sys/wait.h>
+
 
 // Вспомогательная функция для выполнения системных команд
 std::string InfoCollector::exec(const char* cmd) {
     char buffer[128];
     std::string result = "";
     FILE* pipe = popen(cmd, "r");
-    if (!pipe) return "unknown";
+    
+    if (!pipe) {
+        syslog(LOG_ERR, "TiXerver: Failed to run command: %s", cmd);
+        return "error_exec";
+    }
+
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
         result += buffer;
     }
-    pclose(pipe);
-    // Удаляем лишний перевод строки
-    if (!result.empty() && result[result.length()-1] == '\n') 
-        result.erase(result.length()-1);
-    return result;
+
+    int status = pclose(pipe);
+    if (status != 0) {
+        syslog(LOG_WARNING, "TiXerver: Command '%s' returned code %d", cmd, WEXITSTATUS(status));
+    }
+
+    // Удаляем \n и \r с конца
+    while (!result.empty() && (result[result.length() - 1] == '\n' || result[result.length() - 1] == '\r')) {
+        result.erase(result.length() - 1);
+    }
+
+    return result.empty() ? "unknown" : result;
 }
 
 CameraInfo InfoCollector::collect() {
     CameraInfo info;
 
-    // 1. Модель и серийный номер (через системные файлы Axis)
-    // Обычно лежат в /etc/axis-release или через parhand
-    info.model = exec("grep PROD_SHORTNAME /etc/axis-release | cut -d'=' -f2");
+    info.model = exec("grep 'ProdShortName' /etc/sysconfig/brand.conf | cut -d'\"' -f2");
     info.serial = exec("cat /sys/class/net/eth0/address | tr -d ':'");
+    info.firmware = exec("grep 'UDHCP_OPTARGS_VENDOR_CLASS=' /etc/conf.d/udhcpc.conf | cut -d',' -f4 | tr -d '\"'");
+    info.ntpServer = exec("grep 'NTPSERVER' /etc/sysconfig/openntpd.conf | cut -d\"'\" -f2");
 
-    // 2. IP адрес (через ioctl для eth0)
+    // IP адрес (через ioctl для eth0)
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     struct ifreq ifr;
     ifr.ifr_addr.sa_family = AF_INET;
@@ -42,11 +60,6 @@ CameraInfo InfoCollector::collect() {
     ioctl(fd, SIOCGIFADDR, &ifr);
     close(fd);
     info.ip = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-
-    // 3. Название и версия программы (из вашего package.conf при сборке)
-    // В реальности эти данные можно захардкодить в макросы через Makefile
-    // info.appName = "TiXerver";
-    // info.appVersion = "1.0.1";
 
     time_t now = time(0);
     struct tm tstruct;
@@ -71,6 +84,16 @@ CameraInfo InfoCollector::collect() {
         meminfo.close();
     } else {
         info.memFree = "unknown";
+    }
+
+    std::ifstream loadinfo("/proc/loadavg");
+    if (loadinfo.is_open()) {
+        std::string avg1;
+        loadinfo >> avg1; // Считываем первое число (load average за 1 минуту)
+        info.cpuLoad = avg1;
+        loadinfo.close();
+    } else {
+        info.cpuLoad = "unknown";
     }
 
     // Данные из макросов Makefile (package.conf)
