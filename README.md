@@ -1,28 +1,81 @@
 # camera-server
-# libevent
-Для многопоточности в libevent рекомендуется создавать отдельный event_base для каждого рабочего потока. На Linux самый эффективный способ распределения нагрузки между потоками — использование флага сокета SO_REUSEPORT, который позволяет нескольким потокам слушать один и тот же порт.
 
-Инициализация потоков: Перед использованием libevent в многопоточном режиме (если вы используете один event_base на всех) нужно вызвать evthread_use_pthreads(). В примере выше это не обязательно, так как у каждого потока свой event_base.
+# How to fix error with old version tar settings in AXIS script eap-create.sh:
 
-SO_REUSEPORT: Этот флаг ядра Linux позволяет системе автоматически балансировать входящие TCP-соединения между потоками без использования мьютексов на этапе accept.
+tar czf $tarb --exclude="*~" --exclude="CVS" --format=gnu $APPNAME $ADPPACKCFG $ADPPACKPARAMCFG \
+                $POSTINSTALLSCRIPT $OTHERFILES $HTTPD_CONF_LOCAL_FILES \
+                $HTTPD_MIME_LOCAL_FILES $HTMLDIR $EVENT_DECLS_DIR $LIBDIR \
+                $LUAPKGFILES $HTTPCGIPATHS
 
-Компиляция: При сборке обязательно линкуйте библиотеки:
-gcc main.c -levent -levent_pthreads -lpthread -o camera_server.
-# libmicrohttpd
-Использование libmicrohttpd (MHD) имеет встроенную поддержку пула потоков. Не нужно вручную управлять pthread_create для каждого запроса — библиотека сама распределяет задачи.
-Преимущества для IP-камер
-Минимальный размер: Библиотека практически не имеет зависимостей (только libc и опционально GnuTLS).
-Простой API: Текстовые команды (API) обрабатываются одной функцией-колбэком.
-Стабильность: MHD эффективно управляет памятью, что критично для встраиваемых Linux-систем.
-Минимальный пример сервера с пулом потоков
-Этот код создает сервер, который слушает порт 8888 и использует пул из 4 потоков для обработки запросов.
+# The simple version for building server with prebuilding for Axis libevent. Don't forget add real-time library for libevent: -lrt
 
-Разбор флагов для многопоточности:
-MHD_USE_INTERNAL_POLLING_THREAD: Сервер работает "в фоне" в собственном потоке (или потоках), не блокируя основной поток main.
-MHD_OPTION_THREAD_POOL_SIZE: Позволяет задать фиксированное количество потоков. Это лучший вариант для камер, так как ограничивает потребление ресурсов CPU. The GNU libmicrohttpd Manual.
-MHD_USE_THREAD_PER_CONNECTION: Если вы не знаете заранее количество клиентов, этот флаг будет создавать новый поток для каждого нового подключения.
+AXIS_USABLE_LIBS = UCLIBC GLIBC
+include $(AXIS_TOP_DIR)/tools/build/rules/common.mak
 
-Сборка
-Для сборки под Linux используйте:
-gcc server.c -lmicrohttpd -o camera_api
-Нужно ли добавить в пример парсинг параметров из URL (например, /api/set_ptz?x=10&y=20) для вашего текстового API?
+CC = mipsisa32r2el-axis-linux-gnu-gcc
+
+LIBEVENT_DIR = $(CURDIR)/libs/build/libevent_mipsisa32r2el
+
+CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -I$(LIBEVENT_DIR)/include
+LDFLAGS = -L$(LIBEVENT_DIR)/lib
+LDLIBS = -levent -lpthread -lrt
+
+TARGET = server
+SRC = main.c
+
+all: $(TARGET)
+
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) $(SRC) $(LDFLAGS) $(LDLIBS) -o $(TARGET)
+
+clean:
+	rm -f $(TARGET)
+
+# The current version of makefile for building server with prebuilding for Axis libevent.
+# How to use: $ make clean debug or $ make clean release and $ create-package.sh mipsisa32r2el. Or $ make clean only.
+
+AXIS_USABLE_LIBS = UCLIBC GLIBC
+include $(AXIS_TOP_DIR)/tools/build/rules/common.mak
+
+CC = mipsisa32r2el-axis-linux-gnu-gcc
+STRIP = mipsisa32r2el-axis-linux-gnu-strip
+
+LIBEVENT_DIR = $(CURDIR)/libs/build/libevent_mipsisa32r2el
+
+# Common flags
+COMMON_FLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -I$(LIBEVENT_DIR)/include
+LDFLAGS = -L$(LIBEVENT_DIR)/lib
+LDLIBS = -levent -lpthread -lrt
+
+TARGET = server
+SRC = main.c
+
+# Debug as default
+all: debug
+
+# DEBUG: add -g (debugging) and turn off optimization
+debug: CFLAGS = $(COMMON_FLAGS) -g -O0
+debug: $(TARGET)
+	@echo "--- DEBUG BUILD FINISHED ---"
+
+# RELEASE: Add -O2 (optinization) and make strip
+release: CFLAGS = $(COMMON_FLAGS) -O2
+release: $(TARGET)
+	$(STRIP) $(TARGET)
+	@echo "--- RELEASE BUILD FINISHED (STRIPPED) ---"
+
+# Building rules
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) $(SRC) $(LDFLAGS) $(LDLIBS) -o $(TARGET)
+
+# Clean
+clean:
+	rm -f $(TARGET)
+	@echo "--- CLEAN FINISHED ---"
+
+.PHONY: all debug release clean
+
+
+# The true type of app after compiling
+$ file server
+server: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (SYSV), dynamically linked, interpreter /lib/ld.so.1, for GNU/Linux 2.6.29, with debug_info, not stripped
