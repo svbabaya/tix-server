@@ -1,5 +1,5 @@
 # Makefile for axis server
-# Before compiling install libevent-dev
+# Before compiling install libmicrohttpd-dev
 
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -O2
@@ -10,8 +10,8 @@ SRC = main.c
 LIB_DIR = /usr/lib/x86_64-linux-gnu
 INC_DIR = /usr/include
 
-# -levent (core), -lpthread (threads), -lrt (timers)
-LDLIBS = -levent -lpthread -lrt
+# -lmicrohttpd (core), -lpthread (threads), -lrt (timers)
+LDLIBS = -lmicrohttpd -lpthread -lrt
 
 all: $(TARGET)
 

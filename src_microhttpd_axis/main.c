@@ -2,15 +2,22 @@
 #include <stdio.h>
 #include <string.h>
 
-#define PORT 8888
+#define PORT 8086
 
 // Колбэк для обработки входящих запросов
 static enum MHD_Result answer_to_connection(void *cls, struct MHD_Connection *connection,
                           const char *url, const char *method,
                           const char *version, const char *upload_data,
                           size_t *upload_data_size, void **con_cls) {
+    (void)cls;
+    (void)url;
+    (void)method;
+    (void)version;
+    (void)upload_data;
+    (void)upload_data_size;
+    (void)con_cls;
     
-    const char *page = "{\"status\": \"ok\", \"message\": \"Camera API is online\"}";
+    const char *page = "{\"status\": \"ok\", \"message\": \"TiXerver is online\"}";
     struct MHD_Response *response;
     enum MHD_Result ret;
 
@@ -28,15 +35,12 @@ static enum MHD_Result answer_to_connection(void *cls, struct MHD_Connection *co
 
 int main() {
     struct MHD_Daemon *daemon;
+    daemon = MHD_start_daemon(MHD_USE_INTERNAL_POLLING_THREAD, 
+                                PORT, NULL, NULL,
+                                &answer_to_connection, NULL,
+                                MHD_OPTION_THREAD_POOL_SIZE, (unsigned int)4,
+                                MHD_OPTION_END);
 
-    // Запуск сервера:
-    // MHD_USE_INTERNAL_POLLING_THREAD - использовать внутренний поток для опроса сокетов
-    // MHD_USE_THREAD_PER_CONNECTION - (альтернатива) отдельный поток на каждое соединение
-    daemon = MHD_start_daemon(MHD_USE_INTERNAL_POLLING_THREAD | MHD_USE_THREAD_PER_CONNECTION, 
-                             PORT, NULL, NULL,
-                             &answer_to_connection, NULL,
-                             MHD_OPTION_THREAD_POOL_SIZE, 4, // Использовать пул из 4 потоков
-                             MHD_OPTION_END);
 
     if (NULL == daemon) return 1;
 

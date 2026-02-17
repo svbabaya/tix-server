@@ -75,7 +75,19 @@ clean:
 
 .PHONY: all debug release clean
 
-
 # The true type of app after compiling
 $ file server
 server: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (SYSV), dynamically linked, interpreter /lib/ld.so.1, for GNU/Linux 2.6.29, with debug_info, not stripped
+
+# How to view logs from camera
+$ watch -n 1 "curl -s -u root:pass http://169.254.211.121 | tail -n 20 | grep analyze"
+or
+$ ssh root@169.254.211.121
+$ tail -f /var/log/messages | grep "TiXerver"
+or
+Setup - System Options - Support - Logs & Reports
+or 
+In project dir .<camera-ip>-var_log_messages*.txt
+
+# NTP server
+$ ntpdate -q 194.190.168.1

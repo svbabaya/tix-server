@@ -10,91 +10,6 @@
 2026-02-13T00:08:33.760+03:00 axis-00408ce86871 [ WARNING ] ntpd[937]: Lost child: child exited
 2026-02-13T09:54:34.087+03:00 axis-00408ce86871 [ WARNING ] ntpd[1784]: dispatch_imsg in main: pipe closed
 2026-02-13T09:54:34.136+03:00 axis-00408ce86871 [ WARNING ] ntpd[1784]: Lost child: child exited
-2026-02-13T22:55:32.056+03:00 axis-00408ce86871 [ INFO    ] libupnp[3344]: Exiting...
-2026-02-13T22:55:32.057+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping UPnP application...
-2026-02-13T22:55:32.340+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped UPnP application.
-2026-02-13T22:55:32.531+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting UPnP application...
-2026-02-13T22:55:33.405+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started UPnP application.
-2026-02-13T22:55:33.663+03:00 axis-00408ce86871 [ INFO    ] ipchanged[676]: Reloading Bonjour (mDNSResponderPosix)
-2026-02-13T22:55:33.889+03:00 axis-00408ce86871 [ INFO    ] libupnp[3422]: UPnP Initialized(192.168.0.90:49152)
-2026-02-14T16:25:22.253+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started update system usage time.
-2026-02-14T17:38:03.441+03:00 axis-00408ce86871 [ INFO    ] netd[320]: [eth0] Device lower state change: 1 -> 0
-2026-02-14T17:38:03.666+03:00 axis-00408ce86871 [ INFO    ] root: No uplink eth0
-2026-02-14T17:38:04.451+03:00 axis-00408ce86871 [ INFO    ] netd[320]: [eth0] Device lower state change: 0 -> 1
-2026-02-14T17:38:04.809+03:00 axis-00408ce86871 [ INFO    ] root: New uplink eth0
-2026-02-14T17:38:05.006+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Complete network re-configuration on eth0...
-2026-02-14T17:38:05.856+03:00 axis-00408ce86871 [ INFO    ] net[3483]: Complete re-configuration of eth0
-2026-02-14T17:38:06.048+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped Volatile resolver configuration.
-2026-02-14T17:38:06.049+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping Volatile resolver configuration...
-2026-02-14T17:38:06.108+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Volatile resolver configuration...
-2026-02-14T17:38:06.251+03:00 axis-00408ce86871 [ INFO    ] mergeresolv.sh[3499]: get_list: no value(s) found for 'nameserver' option(s) in '/etc/resolv.conf.def'
-2026-02-14T17:38:06.315+03:00 axis-00408ce86871 [ INFO    ] mergeresolv.sh[3499]: get_list: no value(s) found for 'domain search' option(s) in '/etc/resolv.conf.def'
-2026-02-14T17:38:06.731+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Volatile resolver configuration.
-2026-02-14T17:38:06.877+03:00 axis-00408ce86871 [ INFO    ] net[3483]: media: auto
-2026-02-14T17:38:06.884+03:00 axis-00408ce86871 [ INFO    ] net[3483]: eth0 going down
-2026-02-14T17:38:07.016+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped DHCP6 client on eth0.
-2026-02-14T17:38:07.099+03:00 axis-00408ce86871 [ INFO    ] net[3483]: rm: can't remove '/var/run/dhcp/dhcp6_eth0.pid': No such file or directory
-2026-02-14T17:38:07.266+03:00 axis-00408ce86871 [ INFO    ] net[3483]: Stopping zeroconf on eth0
-2026-02-14T17:38:07.397+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping Zero configuration networking on eth0...
-2026-02-14T17:38:07.486+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped Zero configuration networking on eth0.
-2026-02-14T17:38:08.016+03:00 axis-00408ce86871 [ INFO    ] netd[320]: [eth0] Removed address: 169.254.211.121
-2026-02-14T17:38:08.061+03:00 axis-00408ce86871 [ NOTICE  ] confloggerd: Service com.axis.Net_1 updated its configuration
-2026-02-14T17:38:08.179+03:00 axis-00408ce86871 [ INFO    ] netd[320]: [eth0] Removed address: 192.168.0.90
-2026-02-14T17:38:08.189+03:00 axis-00408ce86871 [ INFO    ] net[3483]: eth0 going up
-2026-02-14T17:38:08.233+03:00 axis-00408ce86871 [ NOTICE  ] confloggerd: Service com.axis.Net_1 updated its configuration
-2026-02-14T17:38:08.563+03:00 axis-00408ce86871 [ INFO    ] net[3483]: Starting wpa supplicant
-2026-02-14T17:38:08.577+03:00 axis-00408ce86871 [ INFO    ] net[3483]: wpa_supplicant: disabled, see /etc/conf.d/wpa_supplicant.eth0.
-2026-02-14T17:38:08.616+03:00 axis-00408ce86871 [ INFO    ] net[3483]: IPv4 on 'eth0'.
-2026-02-14T17:38:08.619+03:00 axis-00408ce86871 [ INFO    ] net[3483]: Boot protocol: 'none'.
-2026-02-14T17:38:08.806+03:00 axis-00408ce86871 [ INFO    ] netd[320]: [eth0] Added (Static) address: 192.168.0.90
-2026-02-14T17:38:08.820+03:00 axis-00408ce86871 [ INFO    ] net[3483]: IP address: '192.168.0.90'.
-2026-02-14T17:38:08.828+03:00 axis-00408ce86871 [ INFO    ] net[3483]: netmask: '255.255.255.0'.
-2026-02-14T17:38:08.831+03:00 axis-00408ce86871 [ INFO    ] net[3483]: broadcast address: '192.168.0.255'.
-2026-02-14T17:38:08.857+03:00 axis-00408ce86871 [ INFO    ] net[3483]: default IPv4 gateway: '192.168.0.1'.
-2026-02-14T17:38:08.935+03:00 axis-00408ce86871 [ NOTICE  ] confloggerd: Service com.axis.Net_1 updated its configuration
-2026-02-14T17:38:09.318+03:00 axis-00408ce86871 [ INFO    ] net[3483]: Starting zeroconf on eth0
-2026-02-14T17:38:09.540+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Zero configuration networking on eth0...
-2026-02-14T17:38:09.974+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Zero configuration networking on eth0.
-2026-02-14T17:38:10.008+03:00 axis-00408ce86871 [ INFO    ] net[3483]: no IPv6 on eth0
-2026-02-14T17:38:10.145+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped DHCP6 client on eth0.
-2026-02-14T17:38:10.238+03:00 axis-00408ce86871 [ INFO    ] net[3483]: rm: can't remove '/var/run/dhcp/dhcp6_eth0.pid': No such file or directory
-2026-02-14T17:38:10.436+03:00 axis-00408ce86871 [ INFO    ] ntpd[3139]: killed by signal
-2026-02-14T17:38:10.437+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping Network time...
-2026-02-14T17:38:10.438+03:00 axis-00408ce86871 [ INFO    ] ntpd[3139]: ntp engine exiting
-2026-02-14T17:38:10.456+03:00 axis-00408ce86871 [ INFO    ] ntpd[3138]: Terminating
-2026-02-14T17:38:10.529+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped Network time.
-2026-02-14T17:38:10.677+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Network time...
-2026-02-14T17:38:11.170+03:00 axis-00408ce86871 [ INFO    ] ntpd[3616]: ntp engine ready
-2026-02-14T17:38:11.196+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Network time.
-2026-02-14T17:38:11.296+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Complete network re-configuration on eth0.
-2026-02-14T17:38:11.705+03:00 axis-00408ce86871 [ INFO    ] root: /etc/ipchanged.script: Removed IP address 169.254.211.121 from eth0.
-2026-02-14T17:38:11.821+03:00 axis-00408ce86871 [ INFO    ] libupnp[3422]: Exiting...
-2026-02-14T17:38:11.822+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping UPnP application...
-2026-02-14T17:38:12.026+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped UPnP application.
-2026-02-14T17:38:12.093+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting UPnP application...
-2026-02-14T17:38:12.951+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started UPnP application.
-2026-02-14T17:38:13.212+03:00 axis-00408ce86871 [ INFO    ] ipchanged[676]: Reloading Bonjour (mDNSResponderPosix)
-2026-02-14T17:38:13.299+03:00 axis-00408ce86871 [ INFO    ] libupnp[3660]: UPnP Initialized(192.168.0.90:49152)
-2026-02-14T17:38:14.369+03:00 axis-00408ce86871 [ INFO    ] root: /etc/ipchanged.script: Removed IP address 192.168.0.90 from eth0.
-2026-02-14T17:38:14.526+03:00 axis-00408ce86871 [ INFO    ] libupnp[3660]: Exiting...
-2026-02-14T17:38:14.528+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping UPnP application...
-2026-02-14T17:38:14.721+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped UPnP application.
-2026-02-14T17:38:14.796+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting UPnP application...
-2026-02-14T17:38:15.488+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started UPnP application.
-2026-02-14T17:38:15.780+03:00 axis-00408ce86871 [ INFO    ] ipchanged[676]: Reloading Bonjour (mDNSResponderPosix)
-2026-02-14T17:38:15.899+03:00 axis-00408ce86871 [ INFO    ] libupnp[3728]: UPnP Initialized(192.168.0.90:49152)
-2026-02-14T17:38:17.196+03:00 axis-00408ce86871 [ INFO    ] root: /etc/ipchanged.script: New IP address for eth0 is 192.168.0.90.
-2026-02-14T17:38:17.531+03:00 axis-00408ce86871 [ INFO    ] libupnp[3728]: Exiting...
-2026-02-14T17:38:17.533+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping UPnP application...
-2026-02-14T17:38:17.718+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped UPnP application.
-2026-02-14T17:38:17.906+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting UPnP application...
-2026-02-14T17:38:18.366+03:00 axis-00408ce86871 [ INFO    ] zeroconf-ip[3587]: claimed 169.254.211.121
-2026-02-14T17:38:18.728+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started UPnP application.
-2026-02-14T17:38:19.058+03:00 axis-00408ce86871 [ INFO    ] netd[320]: [eth0] Added (Link local) address: 169.254.211.121
-2026-02-14T17:38:19.082+03:00 axis-00408ce86871 [ INFO    ] ipchanged[676]: Reloading Bonjour (mDNSResponderPosix)
-2026-02-14T17:38:19.136+03:00 axis-00408ce86871 [ NOTICE  ] confloggerd: Service com.axis.Net_1 updated its configuration
-2026-02-14T17:38:19.295+03:00 axis-00408ce86871 [ INFO    ] libupnp[3807]: UPnP Initialized(192.168.0.90:49152)
-2026-02-14T17:38:20.296+03:00 axis-00408ce86871 [ INFO    ] root: /etc/ipchanged.script: New IP address for eth0 is 169.254.211.121.
 2026-02-14T17:38:20.664+03:00 axis-00408ce86871 [ INFO    ] libupnp[3807]: Exiting...
 2026-02-14T17:38:20.665+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping UPnP application...
 2026-02-14T17:38:20.876+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped UPnP application.
@@ -259,3 +174,36 @@
 2026-02-17T15:00:15.999+03:00 axis-00408ce86871 [ WARNING ] sdkserver[6395]: respawnd not running.
 2026-02-17T15:00:16.168+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6395]: [ ok ]
 2026-02-17T15:00:16.197+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped server.
+2026-02-17T15:00:20.164+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting server...
+2026-02-17T15:00:20.211+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6484]: * Starting server...
+2026-02-17T15:00:20.474+03:00 axis-00408ce86871 [ INFO    ] server[0]: starting server
+2026-02-17T15:00:20.499+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6484]: [ ok ]
+2026-02-17T15:00:20.517+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started server.
+2026-02-17T16:25:26.696+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started update system usage time.
+2026-02-17T17:00:19.772+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping server...
+2026-02-17T17:00:19.817+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6730]: * Stopping server...
+2026-02-17T17:00:19.841+03:00 axis-00408ce86871 [ INFO    ] server[0]: stopping server
+2026-02-17T17:00:19.923+03:00 axis-00408ce86871 [ WARNING ] sdkserver[6730]: respawnd not running.
+2026-02-17T17:00:20.084+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6730]: [ ok ]
+2026-02-17T17:00:20.119+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped server.
+2026-02-17T17:16:24.523+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Uploaded '/tmp/Server01_1_0-0_mipsisa32r2el.eap' size:92846
+2026-02-17T17:16:25.556+03:00 axis-00408ce86871 [ NOTICE  ] dbus[450]: [system] Reloaded configuration
+2026-02-17T17:16:27.117+03:00 axis-00408ce86871 [ NOTICE  ] dbus[450]: message repeated 2 times: [ [system] Reloaded configuration]
+2026-02-17T17:16:27.128+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Package /tmp/Server01_1_0-0_mipsisa32r2el.eap installation OK
+2026-02-17T17:16:27.179+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Reloading.
+2026-02-17T17:16:53.559+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting server...
+2026-02-17T17:16:53.625+03:00 axis-00408ce86871 [ INFO    ] sdkserver[7149]: * Starting server...
+2026-02-17T17:16:53.972+03:00 axis-00408ce86871 [ INFO    ] server[0]: starting server
+2026-02-17T17:16:53.999+03:00 axis-00408ce86871 [ INFO    ] sdkserver[7149]: [ ok ]
+2026-02-17T17:16:54.008+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started server.
+2026-02-17T17:16:54.031+03:00 axis-00408ce86871 [ INFO    ] TiXerver[7172]: Starting main function...
+2026-02-17T17:16:54.036+03:00 axis-00408ce86871 [ INFO    ] TiXerver[7172]: Server started on port 8085... syslog
+2026-02-17T17:27:15.721+03:00 axis-00408ce86871 [ NOTICE  ] dbus[450]: [system] Activating via systemd: service name='com.axis.TriggerData' unit='dbus-com.axis.TriggerData.service'
+2026-02-17T17:27:15.825+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Trigger daemon.
+2026-02-17T17:27:16.536+03:00 axis-00408ce86871 [ NOTICE  ] dbus[450]: [system] Successfully activated service 'com.axis.TriggerData'
+2026-02-17T17:49:17.189+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping server...
+2026-02-17T17:49:17.244+03:00 axis-00408ce86871 [ INFO    ] sdkserver[8260]: * Stopping server...
+2026-02-17T17:49:17.273+03:00 axis-00408ce86871 [ INFO    ] server[0]: stopping server
+2026-02-17T17:49:17.343+03:00 axis-00408ce86871 [ WARNING ] sdkserver[8260]: respawnd not running.
+2026-02-17T17:49:17.509+03:00 axis-00408ce86871 [ INFO    ] sdkserver[8260]: [ ok ]
+2026-02-17T17:49:17.543+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped server.
