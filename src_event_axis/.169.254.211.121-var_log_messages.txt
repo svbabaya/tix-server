@@ -237,3 +237,25 @@
 2026-02-17T14:46:14.687+03:00 axis-00408ce86871 [ INFO    ] server[0]: starting server
 2026-02-17T14:46:14.718+03:00 axis-00408ce86871 [ INFO    ] sdkserver[5623]: [ ok ]
 2026-02-17T14:46:14.726+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started server.
+2026-02-17T14:46:52.416+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping server...
+2026-02-17T14:46:52.473+03:00 axis-00408ce86871 [ INFO    ] sdkserver[5864]: * Stopping server...
+2026-02-17T14:46:52.493+03:00 axis-00408ce86871 [ INFO    ] server[0]: stopping server
+2026-02-17T14:46:52.568+03:00 axis-00408ce86871 [ WARNING ] sdkserver[5864]: respawnd not running.
+2026-02-17T14:46:52.730+03:00 axis-00408ce86871 [ INFO    ] sdkserver[5864]: [ ok ]
+2026-02-17T14:46:52.764+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped server.
+2026-02-17T14:59:00.062+03:00 axis-00408ce86871 [ NOTICE  ] dbus[450]: [system] Reloaded configuration
+2026-02-17T14:59:00.458+03:00 axis-00408ce86871 [ NOTICE  ] dbus[450]: [system] Reloaded configuration
+2026-02-17T14:59:50.387+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Uploaded '/tmp/Server01_1_0-0_mipsisa32r2el.eap' size:92786
+2026-02-17T14:59:51.832+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Package /tmp/Server01_1_0-0_mipsisa32r2el.eap installation OK
+2026-02-17T14:59:51.880+03:00 axis-00408ce86871 [ NOTICE  ] dbus[450]: [system] Reloaded configuration
+2026-02-17T15:00:08.058+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting server...
+2026-02-17T15:00:08.110+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6311]: * Starting server...
+2026-02-17T15:00:08.369+03:00 axis-00408ce86871 [ INFO    ] server[0]: starting server
+2026-02-17T15:00:08.396+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6311]: [ ok ]
+2026-02-17T15:00:08.417+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started server.
+2026-02-17T15:00:15.849+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping server...
+2026-02-17T15:00:15.900+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6395]: * Stopping server...
+2026-02-17T15:00:15.926+03:00 axis-00408ce86871 [ INFO    ] server[0]: stopping server
+2026-02-17T15:00:15.999+03:00 axis-00408ce86871 [ WARNING ] sdkserver[6395]: respawnd not running.
+2026-02-17T15:00:16.168+03:00 axis-00408ce86871 [ INFO    ] sdkserver[6395]: [ ok ]
+2026-02-17T15:00:16.197+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped server.

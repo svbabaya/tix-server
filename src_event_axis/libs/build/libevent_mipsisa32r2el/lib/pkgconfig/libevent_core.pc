@@ -1,0 +1,16 @@
+#libevent pkg-config source file
+
+prefix=/mnt/c/viat/projects/camera-server/src_event_axis/libs/build/libevent
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libevent_core
+Description: libevent_core
+Version: 2.1.12-stable
+Requires:
+Conflicts:
+Libs: -L${libdir} -levent_core
+Libs.private: -lrt 
+Cflags: -I${includedir}
+

@@ -1,5 +1,9 @@
 # Add
-build
+*.old
+*.txt
+.eap-install.cfg
+.target-makefrag
+*.eap
 
 # Prerequisites
 *.d
