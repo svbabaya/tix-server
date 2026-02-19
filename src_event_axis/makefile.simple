@@ -1,3 +1,5 @@
+# Makefile for building tixerver
+
 # Path to SDK Axis (makes in 'source init_env')
 AXIS_USABLE_LIBS = UCLIBC GLIBC
 include $(AXIS_TOP_DIR)/tools/build/rules/common.mak

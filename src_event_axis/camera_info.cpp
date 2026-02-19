@@ -36,7 +36,7 @@ std::string InfoCollector::exec(const char* cmd) {
         syslog(LOG_WARNING, "TiXerver: Command '%s' returned code %d", cmd, WEXITSTATUS(status));
     }
 
-    // Удаляем \n и \r с конца
+    // Удаляем \n и \r в конце строки
     while (!result.empty() && (result[result.length() - 1] == '\n' || result[result.length() - 1] == '\r')) {
         result.erase(result.length() - 1);
     }
