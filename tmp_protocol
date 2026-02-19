@@ -1,0 +1,27 @@
+ # Common
+    respMap["gv\r\n"] = &TCPServerClass::gv_response;
+	respMap["is\r\n"] = &TCPServerClass::is_response;
+	respMap["id\r\n"] = &TCPServerClass::id_response;
+	respMap["gcam\r\n"] = &TCPServerClass::gCam_response;
+	//"scam s=" обрабатываются отдельно в clients_work
+	respMap["ex\r\n"] = &TCPServerClass::ex_response;
+    respMap["gp\r\n"] = &TCPServerClass::gp_response;
+
+	//-команды с параметрами ищутся с символом пробел
+	respMap["sm "] = &TCPServerClass::sm_response;
+    
+# TraffiXtream
+	//  traff
+	respMap["ge\r\n"] = &TCPServerClass::ge_response;
+	respMap["ge2\r\n"] = &TCPServerClass::ge2_response;
+	respMap["gs\r\n"] = &TCPServerClass::gs_response;
+    respMap["gk\r\n"] = &TCPServerClass::gk_response;
+    respMap["gl\r\n"] = &TCPServerClass::gl_response;
+    respMap["gtrc\r\n"] = &TCPServerClass::gTrC_response;
+    respMap["gtrp\r\n"] = &TCPServerClass::gTrP_response;
+	//"strc s=", "strp s=" обрабатываются отдельно в clients_work
+
+	//-команды с параметрами ищутся с символом пробел
+	respMap["rq "] = &TCPServerClass::rq_response;
+    respMap["gd "] = &TCPServerClass::gd_response;   //опционально у команды gd
+    respMap["gd\r\n"] = &TCPServerClass::gd_response;//может не быть параметров
