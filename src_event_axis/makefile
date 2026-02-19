@@ -18,7 +18,7 @@ LDFLAGS = -L$(LIBEVENT_DIR)/lib
 LDLIBS = -levent -lpthread -lrt
 
 TARGET = tixerver
-SRC = main.cpp camera_info.cpp
+SRC = main2.cpp camera_info.cpp
 
 all: debug
 

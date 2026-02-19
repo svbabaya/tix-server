@@ -16,7 +16,7 @@ void request_handler(struct evhttp_request *req, void *arg) {
     struct server_config *config = (struct server_config *)arg;
     config->total_requests++;
 
-    // 1. Собираем данные через ваш C++ класс
+    // 1. Собираем данные
     CameraInfo info = InfoCollector::collect();
     std::string jsonResponse = info.toJson() + "\n";
     struct evbuffer *buf = evbuffer_new();
