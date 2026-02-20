@@ -1,5 +1,8 @@
 #include "math300_engine.hpp"
+
+#include <cmath>
 #include <unistd.h>
+
 
 void* MathEngine::run_thread(void* arg) {
     AppContext* ctx = (AppContext*)arg;
@@ -29,6 +32,19 @@ void MathEngine::processing_loop(AppContext* ctx) {
 }
 
 int MathEngine::analyze(const VideoSettings& current_cfg) {
+
+    // --- Имитация высокой нагрузки ---
+    double dummy_work = 0.0;
+    // Число итераций подберите экспериментально. 
+    // 1 000 000 обычно дает заметную нагрузку на слабых CPU камер.
+    for (int i = 0; i < 10000; ++i) {
+        dummy_work += std::sin(i) * std::cos(i) + std::sqrt(i + current_cfg.threshold);
+
+    }
+    // Используем переменную, чтобы оптимизатор компилятора не выкинул цикл
+    if (dummy_work < 0) return -1; 
+    // ---------------------------------
+
     // Вся ваша математика здесь
     if (current_cfg.threshold > 50) {
         return 1;

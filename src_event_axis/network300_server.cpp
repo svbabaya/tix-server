@@ -1,3 +1,9 @@
+#include "network300_server.hpp"
+
+extern "C" {
+    #include "cJSON.h"
+}
+
 #include <event2/event.h>
 #include <event2/http.h>
 #include <event2/buffer.h>
@@ -6,21 +12,20 @@
 #include <arpa/inet.h>
 #include <syslog.h>
 #include <stdlib.h>
-// #include <string.h>
 #include <cstring>
-
-extern "C" {
-    #include "cJSON.h"
-}
-
-#include "network300_server.hpp"
 
 // --- HTTP Обработчики ---
 
 // GET /api/info -> CameraInfo
 void http_get_info_cb(struct evhttp_request* req, void* arg) {
     AppContext* ctx = (AppContext*)arg;
+
+    ctx->info = InfoCollector::collect();
+
+    // pthread_mutex_lock(&ctx->info.lock); 
     std::string json = ctx->info.toJson();
+    // pthread_mutex_unlock(&ctx->info.lock);
+
     
     struct evbuffer* buf = evbuffer_new();
     evbuffer_add(buf, json.c_str(), (int)json.length());

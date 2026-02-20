@@ -16,6 +16,8 @@ public:
     std::string memFree;
     std::string ntpServer;
 
+    // pthread_mutex_t lock;
+
     std::string toJson() const {
         return "{"
                "\"model\": \"" + model + "\", "
