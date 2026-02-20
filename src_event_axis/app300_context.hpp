@@ -1,9 +1,11 @@
 #ifndef APP_CONTEXT_HPP
 #define APP_CONTEXT_HPP
 
+#include "camera_info.hpp"
+#include "command300_processor.hpp"
+
 #include <pthread.h>
 #include <string>
-#include "camera_info.hpp" // Ваш существующий класс
 
 // Настройки для математического модуля (меняются через POST)
 struct VideoSettings {
@@ -35,6 +37,7 @@ struct AppContext {
     VideoSettings settings;
     MathResults results;
     CameraInfo info;
+    CommandProcessor processor;
 
     AppContext(struct event_base* b) : base(b) {}
 };

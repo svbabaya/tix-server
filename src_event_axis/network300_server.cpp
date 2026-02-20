@@ -76,17 +76,13 @@ void tcp_read_cb(struct bufferevent* bev, void* arg) {
     size_t n;
 
     while ((line = evbuffer_readln(input, &n, EVBUFFER_EOL_CRLF))) {
-        if (strcmp(line, "GET_MATH") == 0) {
-            pthread_mutex_lock(&ctx->results.lock);
-            int count = ctx->results.objects_detected;
-            double score = ctx->results.last_score;
-            pthread_mutex_unlock(&ctx->results.lock);
+        std::string command(line);
+        free(line); // Освобождаем сразу после копирования в string
 
-            char resp[128];
-            snprintf(resp, sizeof(resp), "{\"detected\": %d, \"score\": %.2f}\n", count, score);
-            bufferevent_write(bev, resp, (int)strlen(resp));
-        }
-        free(line);
+        // Диспетчер находит нужную функцию и возвращает ответ
+        std::string response = ctx->processor.execute(command, ctx);
+        
+        bufferevent_write(bev, response.c_str(), response.length());
     }
 }
 

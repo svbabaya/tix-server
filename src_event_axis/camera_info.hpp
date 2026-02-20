@@ -6,27 +6,27 @@
 class CameraInfo {
 public:
     std::string model;
-    std::string serial;
-    std::string firmware;
     std::string ip;
+    std::string serial;
     std::string appName;
     std::string appVersion;
+    std::string firmware;
+    std::string ntpServer;
     std::string currentTime;
     std::string cpuLoad;
     std::string memFree;
-    std::string ntpServer;
-
+    
     // pthread_mutex_t lock;
 
     std::string toJson() const {
         return "{"
                "\"model\": \"" + model + "\", "
-               "\"serial\": \"" + serial + "\", "
-               "\"firmware\": \"" + firmware + "\", "
                "\"ip\": \"" + ip + "\", "
-               "\"ntp\": \"" + ntpServer + "\", "
+               "\"serial\": \"" + serial + "\", "
                "\"app\": \"" + appName + "\", "
                "\"ver\": \"" + appVersion + "\", "
+               "\"firmware\": \"" + firmware + "\", "
+               "\"ntp\": \"" + ntpServer + "\", "
                "\"camera_time\": \"" + currentTime + "\", "
                "\"cpu_load\": \"" + cpuLoad + "\", "
                "\"mem_free\": \"" + memFree + "\""
