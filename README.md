@@ -1,5 +1,5 @@
 # camera-server
-
+```mermaid
 graph TD
     %% Определение узлов
     Start((Начало main)) --> InitLibevent[Инициализация libevent base]
@@ -34,7 +34,7 @@ graph TD
     style CreateContext fill:#f9f,stroke:#333,stroke-width:2px
     style MainThread fill:#e1f5fe,stroke:#01579b
     style MathProcess fill:#fff3e0,stroke:#e65100
-
+```
 Как читать эту схему:
 AppContext (розовый блок): Это центральное хранилище (Shared Context), через которое общаются два независимых потока.
 Синий блок (Main Thread): Здесь крутится libevent. Он отвечает на ваши запросы GET_MATH и GET /api/info. Он "спит", пока не придет пакет по сети.
@@ -44,6 +44,7 @@ AppContext (розовый блок): Это центральное хранил
 Диаграмма последовательности (Sequence Diagram)
 Показать именно логику запроса (например, как данные попадают из MathEngine к вам в Telnet):
 
+```mermaid
 sequenceDiagram
     participant M as MathEngine Thread
     participant C as AppContext (Shared)
@@ -57,3 +58,4 @@ sequenceDiagram
     N->>C: Чтение results (lock mutex)
     C-->>N: Данные (count, score)
     N->>U: JSON Response
+```
