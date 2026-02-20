@@ -4,80 +4,7 @@
 
 2026-02-19T12:06:11.303+03:00 axis-00408ce86871 [ WARNING ] ptz-setup[673]: set_port_manager_first_cpu_mac_address: failed to get cpu_id
 2026-02-19T12:06:11.303+03:00 axis-00408ce86871 [ WARNING ] ptz-setup[673]: set_port_manager_first_cpu_mac_address: failed to get cpu_id
-2026-02-19T12:06:12.650+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started UPnP application.
-2026-02-19T12:06:13.411+03:00 axis-00408ce86871 [ INFO    ] stclient[775]: stclient[775]: [avhs-dbus.c:117] avhs service has name 'com.axis.AVHS'
-2026-02-19T12:06:13.412+03:00 axis-00408ce86871 [ INFO    ] stclient[775]: [avhs-dbus.c:117] avhs service has name 'com.axis.AVHS'
-2026-02-19T12:06:13.415+03:00 axis-00408ce86871 [ INFO    ] stclient[775]: stclient[775]: [avhs-dbus.c:129] object path '/com/axis/AVHS' already registered
-2026-02-19T12:06:13.421+03:00 axis-00408ce86871 [ INFO    ] stclient[775]: [avhs-dbus.c:129] object path '/com/axis/AVHS' already registered
-2026-02-19T12:06:13.423+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Remote Service Client Daemon.
-2026-02-19T12:06:13.428+03:00 axis-00408ce86871 [ INFO    ] stclient[775]: stclient[775]: [commandchannel.c:662] Waiting for system ready before starting command channel thread
-2026-02-19T12:06:13.439+03:00 axis-00408ce86871 [ INFO    ] stclient[775]: [commandchannel.c:662] Waiting for system ready before starting command channel thread
-2026-02-19T12:06:13.616+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Scheduled events daemon.
-2026-02-19T12:06:14.016+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Temperature controller.
-2026-02-19T12:06:14.137+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Focus daemon starter...
-2026-02-19T12:06:14.190+03:00 axis-00408ce86871 [ INFO    ] libupnp[937]: UPnP Initialized(192.168.0.90:49152)
-2026-02-19T12:06:14.486+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Bonjour (mDNSResponderPosix).
-2026-02-19T12:06:14.909+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Focus daemon...
-2026-02-19T12:06:15.214+03:00 axis-00408ce86871 [ INFO    ] tampering[690]: killall: utask: no process killed
-2026-02-19T12:06:15.426+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started ALSA mixer control setup.
-2026-02-19T12:06:15.486+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Action Engine Service for Users...
-2026-02-19T12:06:15.537+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Action Engine Service for System...
-2026-02-19T12:06:15.979+03:00 axis-00408ce86871 [ INFO    ] tampering[690]: killall: triggerd: no process killed
 2026-02-19T12:06:16.145+03:00 axis-00408ce86871 [ WARNING ] scheduled[696]: Timezone was manipulated!
-2026-02-19T12:06:16.646+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: Starting
-2026-02-19T12:06:16.647+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: Starting
-2026-02-19T12:06:16.766+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: Probing for image controller, s='com.axis.ImageControl' o='/com/axis/ImageControl/0/0' i='com.axis.ImageControlStream'
-2026-02-19T12:06:16.767+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: Probing for image controller, s='com.axis.ImageControl' o='/com/axis/ImageControl/0/0' i='com.axis.ImageControlStream'
-2026-02-19T12:06:17.126+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Active storage manager.
-2026-02-19T12:06:17.206+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Storage Stability Helper.
-2026-02-19T12:06:17.221+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Recording indexer...
-2026-02-19T12:06:17.520+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Action Engine Service for System.
-2026-02-19T12:06:17.530+03:00 axis-00408ce86871 [ INFO    ] actionengined-system[994]: Registered com.axis.Event.ActionEngine.System /com/axis/Event/ActionEngine
-2026-02-19T12:06:17.565+03:00 axis-00408ce86871 [ INFO    ] actionengined-user[992]: Registered com.axis.Event.ActionEngine.User /com/axis/Event/ActionEngine
-2026-02-19T12:06:17.587+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Action Engine Service for Users.
-2026-02-19T12:06:17.788+03:00 axis-00408ce86871 [ INFO    ] ptzportmanagerd0[982]: ptz_port_remote_set_property, Authentication key changed. Reopening port.
-2026-02-19T12:06:17.995+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: Using image controller s='com.axis.ImageControl' o='/com/axis/ImageControl/0/0' i='com.axis.ImageControlStream'
-2026-02-19T12:06:17.998+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: Using image controller s='com.axis.ImageControl' o='/com/axis/ImageControl/0/0' i='com.axis.ImageControlStream'
-2026-02-19T12:06:18.169+03:00 axis-00408ce86871 [ INFO    ] ptzportmanagerd0[982]: Started UNIX server
-2026-02-19T12:06:18.422+03:00 axis-00408ce86871 [ INFO    ] disks[814]: Disk configuration file /etc/dynamic/storage.conf not found, error: No such file or directory
-2026-02-19T12:06:18.510+03:00 axis-00408ce86871 [ INFO    ] ptzportmanagerd0[982]: Open "/dev/ttyS4", 9600 baud, 8N1 in "RS485" mode.
-2026-02-19T12:06:18.540+03:00 axis-00408ce86871 [ NOTICE  ] actionengined-system[994]: Loading "Button0 pressed" action rule
-2026-02-19T12:06:18.570+03:00 axis-00408ce86871 [ INFO    ] ptzportmanagerd0[982]: Started port manager: index=0, cpu_id=0, blade_id=0, first_cpu_mac_address=00408CE86871
-2026-02-19T12:06:18.610+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started PTZ port manager on 0.
-2026-02-19T12:06:18.706+03:00 axis-00408ce86871 [ NOTICE  ] disks[814]: Disk SD_DISK (/dev/mmcblk0p1) not present
-2026-02-19T12:06:18.796+03:00 axis-00408ce86871 [ NOTICE  ] disks[814]: Disk SD_DISK starting mount w/ id 1
-2026-02-19T12:06:18.832+03:00 axis-00408ce86871 [ NOTICE  ] disks[814]: Disk SD_DISK (/dev/mmcblk0p1) not present
-2026-02-19T12:06:18.851+03:00 axis-00408ce86871 [ NOTICE  ] disks[814]: Disk NetworkShare starting mount w/ id 2
-2026-02-19T12:06:18.883+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting PTZ coordinator daemon...
-2026-02-19T12:06:19.026+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: Motor calibration OK
-2026-02-19T12:06:19.027+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: Motor calibration OK
-2026-02-19T12:06:19.058+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: updated motor configuration
-2026-02-19T12:06:19.060+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: updated motor configuration
-2026-02-19T12:06:19.095+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd_motor_artpec3_fpga_r2_reset_controller
-2026-02-19T12:06:19.097+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: focusd_motor_artpec3_fpga_r2_reset_controller
-2026-02-19T12:06:19.114+03:00 axis-00408ce86871 [ NOTICE  ] actionengined-system[994]: Loading "System ready" action rule
-2026-02-19T12:06:19.210+03:00 axis-00408ce86871 [ NOTICE  ] actionengined-system[994]: Loading "Start axisns on button press" action rule
-2026-02-19T12:06:19.420+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: Can not register at powerd: powerd is down
-2026-02-19T12:06:19.422+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: Can not register at powerd: powerd is down
-2026-02-19T12:06:19.702+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: new window: x 0xC0/192 y 0x90/144 w 0x380/896 h 0x2A0/672
-2026-02-19T12:06:19.720+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: focusd_optics_motorized_focus:: Forcing temperature compensation mode to perform search for hillcheck
-2026-02-19T12:06:19.721+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd_optics_motorized_focus:: Forcing temperature compensation mode to perform search for hillcheck
-2026-02-19T12:06:20.186+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Focus daemon.
-2026-02-19T12:06:20.312+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Focus daemon starter.
-2026-02-19T12:06:20.549+03:00 axis-00408ce86871 [ INFO    ] indexer: indexer started successfully
-2026-02-19T12:06:20.840+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: Starting up focus
-2026-02-19T12:06:20.841+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: Starting up focus - done
-2026-02-19T12:06:20.842+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: Starting up focus
-2026-02-19T12:06:20.843+03:00 axis-00408ce86871 [ INFO    ] focusd[984]: focusd[984]: Starting up focus - done
-2026-02-19T12:06:22.332+03:00 axis-00408ce86871 [ INFO    ] ptzaurus[1086]: Starting driver DigitalPTZ[1121]
-2026-02-19T12:06:22.397+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started PTZ coordinator daemon.
-2026-02-19T12:06:22.513+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Recording indexer.
-2026-02-19T12:06:22.619+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting PTZ vapix daemon...
-2026-02-19T12:06:23.637+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Web service.
-2026-02-19T12:06:23.731+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Start multistreams for ONVIF media profiles...
-2026-02-19T12:06:23.777+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting Web service discovery daemon...
-2026-02-19T12:06:24.201+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Activating via systemd: service name='com.axis.PolicyKitParhand' unit='dbus-com.axis.PolicyKitParhand.service'
-2026-02-19T12:06:24.286+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting PolicyKit parhand management...
 2026-02-19T12:06:24.627+03:00 axis-00408ce86871 [ NOTICE  ] wsdd[1138]: Starting
 2026-02-19T12:06:24.734+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Successfully activated service 'com.axis.PolicyKitParhand'
 2026-02-19T12:06:24.752+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started PolicyKit parhand management.
@@ -187,3 +114,67 @@
 2026-02-19T22:41:14.316+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Uploaded '/tmp/TiXerver_1_0-1_mipsisa32r2el.eap' size:102490
 2026-02-19T22:41:15.827+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
 2026-02-19T22:41:15.869+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Package /tmp/TiXerver_1_0-1_mipsisa32r2el.eap installation OK
+2026-02-19T22:41:29.799+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-19T22:41:29.858+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2479]: * Starting tixerver...
+2026-02-19T22:41:30.124+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-19T22:41:30.157+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2479]: [ ok ]
+2026-02-19T22:41:30.170+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-19T22:41:30.219+03:00 axis-00408ce86871 [ INFO    ] TiXerver[2494]: TiXerver started. HTTP: 8085, TCP: 8888
+2026-02-19T23:25:17.328+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-19T23:25:17.383+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2576]: * Stopping tixerver...
+2026-02-19T23:25:17.404+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-19T23:25:17.493+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[2576]: respawnd not running.
+2026-02-19T23:25:17.651+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2576]: [ ok ]
+2026-02-19T23:25:17.684+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-19T23:25:34.482+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Uploaded '/tmp/TiXerver_1_0-1_mipsisa32r2el.eap' size:102559
+2026-02-19T23:25:35.530+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
+2026-02-19T23:25:37.264+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: message repeated 2 times: [ [system] Reloaded configuration]
+2026-02-19T23:25:37.271+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Package /tmp/TiXerver_1_0-1_mipsisa32r2el.eap installation OK
+2026-02-19T23:25:37.327+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Reloading.
+2026-02-19T23:25:47.936+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-19T23:25:47.976+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2853]: * Starting tixerver...
+2026-02-19T23:25:48.243+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-19T23:25:48.273+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2853]: [ ok ]
+2026-02-19T23:25:48.282+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-19T23:25:48.352+03:00 axis-00408ce86871 [ INFO    ] TiXerver[2869]: TiXerver running. TCP:8888, HTTP:8085
+2026-02-19T23:32:57.277+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-19T23:32:57.328+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2959]: * Stopping tixerver...
+2026-02-19T23:32:57.354+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-19T23:32:57.426+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[2959]: respawnd not running.
+2026-02-19T23:32:57.592+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[2959]: [ ok ]
+2026-02-19T23:32:57.626+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-19T23:36:16.056+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-19T23:36:16.104+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[3049]: * Starting tixerver...
+2026-02-19T23:36:16.361+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-19T23:36:16.395+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[3049]: [ ok ]
+2026-02-19T23:36:16.403+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-19T23:36:16.469+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: TiXerver running. TCP:8888, HTTP:8085
+2026-02-19T23:52:36.707+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update FPS setting: 30
+2026-02-19T23:52:36.708+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update Server address: 10.0.0.50
+2026-02-19T23:54:41.178+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update Server address: 10.0.0.50
+2026-02-19T23:56:06.695+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update FPS setting: 200
+2026-02-19T23:56:06.696+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update Server address: 10.0.0.50
+2026-02-19T23:59:27.358+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Per-Connection SSH Daemon (169.254.91.205:56150).
+2026-02-20T00:00:34.382+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Per-Connection SSH Daemon (169.254.91.205:56158).
+2026-02-20T00:15:00.893+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update FPS setting: 200
+2026-02-20T00:15:00.894+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update Server address: 10.0.0.50
+2026-02-20T00:15:41.977+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: message repeated 3 times: [ Update Server address: 10.0.0.50]
+2026-02-20T00:15:51.462+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update FPS setting: 200
+2026-02-20T00:15:51.463+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update Server address: 10.0.0.50
+2026-02-20T00:16:00.059+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update FPS setting: 200
+2026-02-20T00:16:00.060+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update Server address: 10.0.0.50
+2026-02-20T00:16:14.466+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update FPS setting: 200
+2026-02-20T00:16:24.695+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: message repeated 3 times: [ Update FPS setting: 200]
+2026-02-20T00:16:51.029+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update FPS setting: 25
+2026-02-20T00:16:51.030+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3064]: Update Server address: 10.10.10.10
+2026-02-20T02:21:26.216+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-20T02:21:26.257+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[3567]: * Stopping tixerver...
+2026-02-20T02:21:26.278+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-20T02:21:26.367+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[3567]: respawnd not running.
+2026-02-20T02:21:26.539+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[3567]: [ ok ]
+2026-02-20T02:21:26.569+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-20T02:21:27.452+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
+2026-02-20T02:21:27.879+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
+2026-02-20T02:21:37.895+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Uploaded '/tmp/TiXerver_1_0-1_mipsisa32r2el.eap' size:102926
+2026-02-20T02:21:39.454+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Package /tmp/TiXerver_1_0-1_mipsisa32r2el.eap installation OK
+2026-02-20T02:21:39.486+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
