@@ -24,7 +24,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
         ctx->results.objects_detected = result;
         pthread_mutex_unlock(&ctx->results.lock);
 
-        usleep(100000); // 10 FPS
+        usleep(100000); // 0.1 sec
     }
 }
 

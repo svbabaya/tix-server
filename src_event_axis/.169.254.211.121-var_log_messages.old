@@ -178,3 +178,75 @@
 2026-02-20T02:21:37.895+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Uploaded '/tmp/TiXerver_1_0-1_mipsisa32r2el.eap' size:102926
 2026-02-20T02:21:39.454+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Package /tmp/TiXerver_1_0-1_mipsisa32r2el.eap installation OK
 2026-02-20T02:21:39.486+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
+2026-02-20T02:22:00.876+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-20T02:22:00.925+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[3822]: * Starting tixerver...
+2026-02-20T02:22:01.209+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-20T02:22:01.239+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[3822]: [ ok ]
+2026-02-20T02:22:01.260+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-20T02:22:01.469+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3837]: TiXerver fully initialized. Network and Math modules are running.
+2026-02-20T02:27:13.068+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3837]: Settings updated via HTTP
+2026-02-20T02:27:19.016+03:00 axis-00408ce86871 [ INFO    ] TiXerver[3837]: Settings updated via HTTP
+2026-02-20T02:34:52.808+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-20T02:34:52.859+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4079]: * Stopping tixerver...
+2026-02-20T02:34:52.886+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-20T02:34:52.966+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[4079]: respawnd not running.
+2026-02-20T02:34:53.137+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4079]: [ ok ]
+2026-02-20T02:34:53.161+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-20T11:09:18.597+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Per-Connection SSH Daemon (169.254.91.205:56156).
+2026-02-20T11:10:35.276+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-20T11:10:35.326+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4186]: * Starting tixerver...
+2026-02-20T11:10:35.585+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-20T11:10:35.613+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4186]: [ ok ]
+2026-02-20T11:10:35.646+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-20T11:10:35.849+03:00 axis-00408ce86871 [ INFO    ] TiXerver[4201]: TiXerver fully initialized. Network and Math modules are running.
+2026-02-20T11:12:22.941+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Per-Connection SSH Daemon (169.254.91.205:56178).
+2026-02-20T11:13:02.042+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Per-Connection SSH Daemon (169.254.91.205:56208).
+2026-02-20T11:13:29.086+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started Per-Connection SSH Daemon (169.254.91.205:56172).
+2026-02-20T11:15:43.169+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-20T11:15:43.218+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4458]: * Stopping tixerver...
+2026-02-20T11:15:43.240+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-20T11:15:43.322+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[4458]: respawnd not running.
+2026-02-20T11:15:43.491+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4458]: [ ok ]
+2026-02-20T11:15:43.519+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-20T11:15:56.476+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-20T11:15:56.518+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4546]: * Starting tixerver...
+2026-02-20T11:15:56.797+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-20T11:15:56.826+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4546]: [ ok ]
+2026-02-20T11:15:56.852+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-20T11:15:57.064+03:00 axis-00408ce86871 [ INFO    ] TiXerver[4561]: TiXerver fully initialized. Network and Math modules are running.
+2026-02-20T11:16:33.786+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-20T11:16:33.848+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4619]: * Stopping tixerver...
+2026-02-20T11:16:33.861+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-20T11:16:33.939+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[4619]: respawnd not running.
+2026-02-20T11:16:34.106+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4619]: [ ok ]
+2026-02-20T11:16:34.127+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-20T11:16:44.196+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-20T11:16:44.240+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4694]: * Starting tixerver...
+2026-02-20T11:16:44.506+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-20T11:16:44.537+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4694]: [ ok ]
+2026-02-20T11:16:44.545+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-20T11:16:44.862+03:00 axis-00408ce86871 [ INFO    ] TiXerver[4709]: TiXerver fully initialized. Network and Math modules are running.
+2026-02-20T11:17:55.286+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-20T11:17:55.336+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4851]: * Stopping tixerver...
+2026-02-20T11:17:55.347+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-20T11:17:55.434+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[4851]: respawnd not running.
+2026-02-20T11:17:55.603+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4851]: [ ok ]
+2026-02-20T11:17:55.676+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-20T11:18:00.391+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Starting tixerver...
+2026-02-20T11:18:00.422+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4988]: * Starting tixerver...
+2026-02-20T11:18:00.693+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: starting tixerver
+2026-02-20T11:18:00.736+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[4988]: [ ok ]
+2026-02-20T11:18:00.738+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Started tixerver.
+2026-02-20T11:18:01.064+03:00 axis-00408ce86871 [ INFO    ] TiXerver[5003]: TiXerver fully initialized. Network and Math modules are running.
+2026-02-20T11:19:45.306+03:00 axis-00408ce86871 [ INFO    ] control.cgi: Application 'tixerver' is running already
+2026-02-20T11:20:54.076+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopping tixerver...
+2026-02-20T11:20:54.126+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[5290]: * Stopping tixerver...
+2026-02-20T11:20:54.159+03:00 axis-00408ce86871 [ INFO    ] tixerver[0]: stopping tixerver
+2026-02-20T11:20:54.229+03:00 axis-00408ce86871 [ WARNING ] sdktixerver[5290]: respawnd not running.
+2026-02-20T11:20:54.396+03:00 axis-00408ce86871 [ INFO    ] sdktixerver[5290]: [ ok ]
+2026-02-20T11:20:54.426+03:00 axis-00408ce86871 [ INFO    ] systemd[1]: Stopped tixerver.
+2026-02-20T11:20:55.319+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
+2026-02-20T11:20:55.693+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
+2026-02-20T11:21:12.122+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Uploaded '/tmp/TiXerver_1_0-1_mipsisa32r2el.eap' size:102928
+2026-02-20T11:21:13.621+03:00 axis-00408ce86871 [ NOTICE  ] dbus[500]: [system] Reloaded configuration
+2026-02-20T11:21:13.635+03:00 axis-00408ce86871 [ INFO    ] upload.cgi: Package /tmp/TiXerver_1_0-1_mipsisa32r2el.eap installation OK

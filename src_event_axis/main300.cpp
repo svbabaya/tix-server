@@ -23,9 +23,9 @@ int main() {
     // Заполняем статичные данные о камере при старте
     app.info = InfoCollector::collect(); 
 
-    // 3. Запуск сетевого модуля (HTTP: 8085, TCP: 8888)
+    // 3. Запуск сетевого модуля (HTTP: 8085, TCP: 8095)
     // Сервер получает указатель на app, чтобы менять настройки и читать результаты
-    if (!NetworkServer::start(&app, 8085, 8888)) {
+    if (!NetworkServer::start(&app, 8085, 8095)) {
         syslog(LOG_CRIT, "Failed to start network services!");
         event_base_free(base);
         return 1;

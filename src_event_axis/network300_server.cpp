@@ -70,7 +70,7 @@ void tcp_read_cb(struct bufferevent* bev, void* arg) {
     char* line;
     size_t n;
 
-    while ((line = evbuffer_readln(input, &n, EVBUFFER_EOL_ANY))) {
+    while ((line = evbuffer_readln(input, &n, EVBUFFER_EOL_CRLF))) {
         if (strcmp(line, "GET_MATH") == 0) {
             pthread_mutex_lock(&ctx->results.lock);
             int count = ctx->results.objects_detected;

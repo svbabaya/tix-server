@@ -86,6 +86,7 @@ CameraInfo InfoCollector::collect() {
         info.memFree = "unknown";
     }
 
+    // Axis 1353 has 2 cores. If cpuLoad=2 it is 100%
     std::ifstream loadinfo("/proc/loadavg");
     if (loadinfo.is_open()) {
         std::string avg1;
