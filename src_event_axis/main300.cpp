@@ -9,6 +9,13 @@
 int main() {
     openlog("TiXerver", LOG_PID | LOG_CONS, LOG_USER);
 
+    // daemon(nochdir, noclose)
+    // 0, 0 означает: перейти в корень и закрыть stdout/stderr/stdin
+    // if (daemon(0, 0) == -1) {
+    //     syslog(LOG_ERR, "Failed to become a daemon");
+    //     return 1;
+    // }
+
     // 1. Инициализация базового цикла libevent
     struct event_base* base = event_base_new();
     if (!base) {
