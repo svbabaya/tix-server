@@ -23,7 +23,7 @@ CXXFLAGS = $(COMMON_FLAGS) -std=c++98
 CFLAGS = $(COMMON_FLAGS) -std=c89
 
 LDFLAGS = -L$(LIBEVENT_DIR)/lib
-LDLIBS = -levent -lpthread -lrt -lm
+LDLIBS = -levent -lpthread -lcapture -lrt -lm
 
 TARGET = tixerver
 

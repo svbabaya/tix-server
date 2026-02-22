@@ -38,7 +38,7 @@ int main() {
         return 1;
     }
 
-    // 4. Запуск МАТЕМАТИЧЕСКОГО МОДУЛЯ в отдельном потоке
+    // 4. Запуск математического модуля в отдельном потоке
     pthread_t math_thread_id;
     // Передаем &app как аргумент, чтобы поток имел доступ к настройкам и буферу данных
     if (pthread_create(&math_thread_id, NULL, MathEngine::run_thread, (void*)&app) != 0) {
