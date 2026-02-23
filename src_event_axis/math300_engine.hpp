@@ -3,6 +3,8 @@
 
 #include "app300_context.hpp"
 
+#include <capture.h>
+
 class MathEngine {
 public:
     // Точка входа для pthread_create (вызывается из main)
@@ -14,7 +16,7 @@ private:
 
     // Чистая математическая логика (принимает настройки, возвращает результат)
     // Мы передаем настройки по ссылке, чтобы не копировать лишнего
-    static int analyze(const VideoSettings& current_cfg); 
+    static int analyze(media_frame* frame, const VideoSettings& current_cfg); 
 };
 
 #endif

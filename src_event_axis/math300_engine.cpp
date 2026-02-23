@@ -11,73 +11,81 @@ void* MathEngine::run_thread(void* arg) {
 }
 
 void MathEngine::processing_loop(AppContext* ctx) {
-    // 1. Инициализация захвата (один раз при старте потока)
-    // Используем минимальное разрешение для экономии ресурсов CPU
-    capture_session_t* session = capture_open_stream("320x240", "yuv");
-    if (!session) {
-        syslog(LOG_CRIT, "MathEngine: Cannot open capture stream!");
+    // В SDK 2: argv[1] это тип ("uncompressed"), argv[2] это свойства
+    // Для ARTPEC-3 лучше использовать Y800 (серый) или YUV
+    media_stream* stream = capture_open_stream("uncompressed", "resolution=320x240&sdk_format=Y800&fps=10");
+    
+    if (stream == NULL) {
+        syslog(LOG_CRIT, "MathEngine: Failed to open stream");
         return;
     }
 
-    syslog(LOG_INFO, "MathEngine: Video stream 320x240 (YUV) started");
+    syslog(LOG_INFO, "MathEngine: Video stream 320x240 Y800 started");
+
+
+
+
+    // gettimeofday(&tv_start, NULL);
+
+    // /* print intital information */
+    // frame = capture_get_frame(stream);
+
+    // LOGINFO("Getting %d frames. resolution: %dx%d framesize: %d\n",
+    //     numframes,
+    //     capture_frame_width(frame),
+    //     capture_frame_height(frame),
+    //     capture_frame_size(frame));
+
+    // capture_frame_free(frame);
+
+
+
 
     while (true) {
-        // 2. Получение кадра (Блокирующий вызов - заменяет usleep)
-        capture_frame_t* frame = capture_get_frame(session);
+        media_frame* frame = capture_get_frame(stream);
         
-        if (frame) {
-            // 3. Копируем настройки под мьютексом
+        if (frame != NULL) {
             VideoSettings cfg; 
             pthread_mutex_lock(&ctx->settings.lock);
             cfg.threshold = ctx->settings.threshold;
             cfg.sensitivity = ctx->settings.sensitivity;
             pthread_mutex_unlock(&ctx->settings.lock);
 
-            // 4. Выполняем анализ реального кадра
             int result = analyze(frame, cfg);
 
-            // 5. Записываем результат под мьютексом
             pthread_mutex_lock(&ctx->results.lock);
             ctx->results.objects_detected = result;
-            // Можно обновить score на основе данных кадра
-            ctx->results.last_score = 0.85; 
+            ctx->results.last_score = 0.77; 
             pthread_mutex_unlock(&ctx->results.lock);
 
-            // 6. ОБЯЗАТЕЛЬНО освобождаем кадр (иначе память Axis переполнится)
             capture_frame_free(frame);
         } else {
-            // Если кадр не получен (например, сбой сенсора), делаем небольшую паузу
-            usleep(100000);
+            syslog(LOG_ERR, "MathEngine: Capture failed");
+            usleep(100000); // 0.1 sec
         }
-        
-        // usleep(100000) здесь больше не нужен, так как частоту цикла 
-        // теперь диктует частота кадров камеры (FPS).
     }
-
-    capture_close_stream(session);
+    capture_close_stream(stream);
 }
 
-int MathEngine::analyze(capture_frame_t* frame, const VideoSettings& current_cfg) {
-    // Получаем доступ к данным кадра (канал яркости Y)
+int MathEngine::analyze(media_frame* frame, const VideoSettings& current_cfg) {
+    // Получаем данные кадра через функции SDK 2
     unsigned char* data = (unsigned char*)capture_frame_data(frame);
-    size_t width = capture_frame_width(frame);
-    size_t height = capture_frame_height(frame);
+    int width = capture_frame_width(frame);
+    int height = capture_frame_height(frame);
 
-    // --- Имитация высокой нагрузки (синхронно с анализом) ---
+    // Имитация нагрузки
     double dummy_work = 0.0;
-    for (int i = 0; i < 10000; ++i) {
+    for (int i = 0; i < 15000; ++i) {
         dummy_work += std::sin(i) * std::cos(i) + std::sqrt(i + current_cfg.threshold);
     }
 
-    // --- Простейшая логика: считаем яркость центрального пикселя ---
-    // (Или любой другой алгоритм на основе данных 'data')
-    int center_pixel_val = data[(width * height) / 2];
+    if (dummy_work < 0) return -1; 
 
-    if (dummy_work < 0) return -1; // Чтобы компилятор не удалил цикл
-
-    // Логика: если яркость в центре выше порога
-    if (center_pixel_val > current_cfg.threshold) {
-        return 1;
+    // Анализ яркости центрального пикселя
+    if (data && width > 0 && height > 0) {
+        int val = data[(width * height) / 2];
+        return (val > current_cfg.threshold) ? 1 : 0;
     }
+
     return 0;
 }
