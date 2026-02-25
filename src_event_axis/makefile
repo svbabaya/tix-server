@@ -42,10 +42,10 @@ LDLIBS = -levent -lpthread -lcapture -lrt -lm $(LIBS)
 
 TARGET = tixerver
 
-CPPSRC = main300.cpp camera_info.cpp network300_server.cpp math300_engine.cpp command300_processor.cpp
+CPPSRC = main.cpp camera_info.cpp network_server.cpp math_engine.cpp command_processor.cpp
 CSRC = $(CJSON_DIR)/cJSON.c
 
-OBJECTS = main300.o camera_info.o network300_server.o math300_engine.o command300_processor.o cJSON.o
+OBJECTS = main.o camera_info.o network_server.o math_engine.o command_processor.o cJSON.o
 
 all: debug
 

@@ -1,5 +1,4 @@
-#ifndef CAMERA_INFO_HPP
-#define CAMERA_INFO_HPP
+#pragma once
 
 #include <string>
 
@@ -40,5 +39,3 @@ public:
 private:
     static std::string exec(const char* cmd);
 };
-
-#endif // CAMERA_INFO_HPP

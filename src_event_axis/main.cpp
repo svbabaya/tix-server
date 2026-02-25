@@ -1,70 +1,65 @@
-#include <event2/event.h>
-#include <event2/http.h>
-#include <event2/buffer.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <pthread.h>
 #include <syslog.h>
+#include <event2/event.h>
 
-#include "camera_info.hpp"
-
-struct server_config {
-    const char *server_name;
-    int total_requests;
-};
-
-void request_handler(struct evhttp_request *req, void *arg) {
-    struct server_config *config = (struct server_config *)arg;
-    config->total_requests++;
-
-    // 1. Собираем данные
-    CameraInfo info = InfoCollector::collect();
-    std::string jsonResponse = info.toJson() + "\n";
-    struct evbuffer *buf = evbuffer_new();
-    if (!buf) return;
-
-    // 2. Добавляем JSON в буфер ответа
-    evbuffer_add(buf, jsonResponse.c_str(), jsonResponse.length());
-
-    // 3. Устанавливаем заголовок ответа (Content-Type: application/json)
-    evhttp_add_header(evhttp_request_get_output_headers(req), 
-                      "Content-Type", "application/json");
-
-    evhttp_send_reply(req, HTTP_OK, "OK", buf);
-    evbuffer_free(buf);
-    
-    syslog(LOG_DEBUG, "Handled request #%d for URI: %s", 
-           config->total_requests, evhttp_request_get_uri(req));
-}
+#include "app_context.hpp"
+#include "network_server.hpp"
+#include "math_engine.hpp"
 
 int main() {
     openlog("TiXerver", LOG_PID | LOG_CONS, LOG_USER);
 
-    struct event_base *base = event_base_new();
+    // daemon(nochdir, noclose)
+    // 0, 0 означает: перейти в корень и закрыть stdout/stderr/stdin
+    // if (daemon(0, 0) == -1) {
+    //     syslog(LOG_ERR, "Failed to become a daemon");
+    //     return 1;
+    // }
+
+    // 1. Инициализация базового цикла libevent
+    struct event_base* base = event_base_new();
     if (!base) {
-        syslog(LOG_CRIT, "Could not initialize libevent!");
+        syslog(LOG_CRIT, "Failed to initialize libevent base!");
         return 1;
     }
 
-    struct evhttp *http = evhttp_new(base);
+    // 2. Создание единого контекста данных (Shared Context)
+    // Передаем указатель на base, чтобы сервер мог регистрировать события
+    AppContext app(base);
     
-    // Инициализация структуры (в C++ стиле)
-    server_config config;
-    config.server_name = "TiXerver";
-    config.total_requests = 0;
+    // Заполняем статичные данные о камере при старте или делаем это при каждом запросе, поскольку не все данные статичные
+    // app.info = InfoCollector::collect(); 
 
-    evhttp_set_gencb(http, request_handler, &config);
-
-    if (evhttp_bind_socket(http, "0.0.0.0", 8085) != 0) {
-        syslog(LOG_CRIT, "Failed to bind port 8085!");
+    // 3. Запуск сетевого модуля (HTTP: 8085, TCP: 8095)
+    // Сервер получает указатель на app, чтобы менять настройки и читать результаты
+    if (!NetworkServer::start(&app, 8085, 8095)) {
+        syslog(LOG_CRIT, "Failed to start network services!");
+        event_base_free(base);
         return 1;
     }
 
-    syslog(LOG_INFO, "TiXerver started on port 8085");
-    
+    // 4. Запуск математического модуля в отдельном потоке
+    pthread_t math_thread_id;
+    // Передаем &app как аргумент, чтобы поток имел доступ к настройкам и буферу данных
+    if (pthread_create(&math_thread_id, NULL, MathEngine::run_thread, (void*)&app) != 0) {
+        syslog(LOG_CRIT, "Failed to create math processing thread!");
+        event_base_free(base);
+        return 1;
+    }
+
+    // Отсоединяем поток, если не планируем делать pthread_join в конце, 
+    // либо оставляем так, чтобы завершить корректно при выходе из цикла.
+    pthread_detach(math_thread_id);
+
+    syslog(LOG_INFO, "TiXerver fully initialized. Network and Math modules are running.");
+
+    // 5. Вход в основной цикл обработки сетевых событий
+    // Этот вызов блокирует текущий (основной) поток.
     event_base_dispatch(base);
 
-    evhttp_free(http);
+    // Точка выхода (сработает при остановке event_base)
     event_base_free(base);
     closelog();
+
     return 0;
 }
