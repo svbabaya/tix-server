@@ -1,188 +1,137 @@
-#include "datastructs.h"
-
-#include "utils_cam.h"
-
+#include "datastructs.hpp"
+#include "utils_cam.h" // Предполагаем наличие i2str
 #include <fstream>
+#include <cstring>
+#include <algorithm>
 
-using std::string;
-
-//CAMERA PARAMS
-string CamParams::params2text(const CamParams &pars)
-{
-	string config, stmp;
-
-	config += "FrameW=" + i2str(pars.FrameW, stmp) + "\n";
-	config += "FrameH=" + i2str(pars.FrameH, stmp) + "\n";
-	config += "RGB_FRAME=" + i2str(pars.RGB_FRAME, stmp) + "\n";
-	config += "MAX_STATISTICS_FILE_SIZE_MB=" + i2str(pars.MAX_STATISTICS_FILE_SIZE_MB, stmp) + "\n";
-	config += "ID_CAM=" + pars.ID_CAM + "\n";
-	config += "CAPT_TYPE=" + pars.CAPT_TYPE + "\n";
-
-	return config;
+// --- CAMERA PARAMS ---
+CamParams::CamParams() {
+    FrameW = FRAME_WIDTH;
+    FrameH = FRAME_HEIGHT;
+    MAX_STATISTICS_FILE_SIZE_MB = MAX_STATISTICS_FILE_SIZE_MB_DEFAULT; 
+    RGB_FRAME = 0;
+    ID_CAM = "Traffic Detector";
+    CAPT_TYPE = "SDK";
 }
 
-CamParams CamParams::readParamsFromFile(bool &isOpened, std::string fname)
-{
-	CamParams out;
-
-	isOpened = false;
-	//LOGINFO("readParamsFromFile() CAM:in\n");
-	try
-	{
-		std::ifstream parametersFile;
-		parametersFile.open(fname.c_str());
-		if (parametersFile.is_open())
-		{
-			//LOGINFO("readParamsFromFile() CAM:file is_open\n");
-			isOpened = true;
-			string row;
-			while (getline(parametersFile, row))
-			{
-				size_t equalIndex = row.find("=");
-				if (equalIndex != string::npos)
-				{
-					string key = row.substr(0, equalIndex),
-						value = row.substr(equalIndex + 1);
-					if (key == "FrameW")
-						out.FrameW = atoi(value.c_str());
-					else if (key == "FrameH")
-						out.FrameH = atoi(value.c_str());
-					else if (key == "RGB_FRAME")
-						out.RGB_FRAME = atoi(value.c_str());
-					else if (key == "MAX_STATISTICS_FILE_SIZE_MB")
-						out.MAX_STATISTICS_FILE_SIZE_MB = atoi(value.c_str());
-					else if (key == "ID_CAM")
-						out.ID_CAM = value;
-					else if (key == "CAPT_TYPE")
-						out.CAPT_TYPE = value;
-				}
-			}
-			parametersFile.close();
-		}
-	}
-	catch (const std::exception &e)
-	{
-		//LOGERR("Camera parameters file parsing error!\n");
-	}
-	//LOGINFO("readParamsFromFile() CAM:out\n");
-
-	return out;
+std::string CamParams::params2text(const CamParams &pars) {
+    std::string config, tmp;
+    config += "FrameW=" + i2str(pars.FrameW, tmp) + "\n";
+    config += "FrameH=" + i2str(pars.FrameH, tmp) + "\n";
+    config += "RGB_FRAME=" + i2str(pars.RGB_FRAME, tmp) + "\n";
+    config += "MAX_STATISTICS_FILE_SIZE_MB=" + i2str(pars.MAX_STATISTICS_FILE_SIZE_MB, tmp) + "\n";
+    config += "ID_CAM=" + pars.ID_CAM + "\n";
+    config += "CAPT_TYPE=" + pars.CAPT_TYPE + "\n";
+    return config;
 }
 
+CamParams CamParams::readParamsFromFile(bool &isOpened, std::string fname) {
+    CamParams out;
+    isOpened = false;
+    std::ifstream file(fname);
+    if (file.is_open()) {
+        isOpened = true;
+        std::string row;
+        while (std::getline(file, row)) {
+            size_t eq = row.find('=');
+            if (eq == std::string::npos) continue;
+            std::string key = row.substr(0, eq);
+            std::string val = row.substr(eq + 1);
 
-//DATA STORAGE
-Frame::Frame()
-	: rgb(false), yuv(false)
-{
-	t.tv_sec = 0;
-	t.tv_usec = 0;
+            if (key == "FrameW") out.FrameW = std::stoi(val);
+            else if (key == "FrameH") out.FrameH = std::stoi(val);
+            else if (key == "RGB_FRAME") out.RGB_FRAME = std::stoi(val);
+            else if (key == "MAX_STATISTICS_FILE_SIZE_MB") out.MAX_STATISTICS_FILE_SIZE_MB = std::stoi(val);
+            else if (key == "ID_CAM") out.ID_CAM = val;
+            else if (key == "CAPT_TYPE") out.CAPT_TYPE = val;
+        }
+    }
+    return out;
 }
 
-Frame Frame::clone() const
-{
-	Frame out;
-	out.mats = RowMatX<uchar>::cloneData();
-	out.rgb = this->rgb;
-	out.yuv = this->yuv;
-	out.t = this->t;
-	return out;
+// --- DATA STORAGE (Frame) ---
+Frame::Frame() : rgb(false), yuv(false) {
+    t.tv_sec = 0;
+    t.tv_usec = 0;
 }
 
-void Frame::getRowPts(FramePt &st, size_t row, size_t col) const
-{
-	if (st.C.size() != mats.size())
-		st.C.resize(mats.size());
-	for (size_t cc = 0; cc < mats.size(); ++cc)
-		st.C[cc] = mats[cc][row] + col;
+// Move constructor
+Frame::Frame(Frame&& other) noexcept 
+    : RowMatX<uchar>(std::move(other)), t(other.t), rgb(other.rgb), yuv(other.yuv) {}
+
+// Move assignment
+Frame& Frame::operator=(Frame&& other) noexcept {
+    if (this != &other) {
+        RowMatX<uchar>::operator=(std::move(other));
+        t = other.t;
+        rgb = other.rgb;
+        yuv = other.yuv;
+    }
+    return *this;
 }
 
-
-//POLYGON
-void TraffPolygon::setPointList(const std::vector<TraffPoint> &list)
-{
-	this->pointList = list;
-	computeBoundingRect();
+Frame Frame::clone() const {
+    Frame out;
+    out.reshape(this->height(), this->width()); 
+    if (!this->empty()) {
+        std::memcpy(out.data(), this->data(), this->height() * this->width());
+    }
+    out.rgb = this->rgb;
+    out.yuv = this->yuv;
+    out.t = this->t;
+    return out;
 }
 
-TraffRect TraffPolygon::getBoundingRect() const
-{
-	return boundingRect;
+// --- GEOMETRY ---
+TraffRect::TraffRect(int x1N, int y1N, int x2N, int y2N) noexcept
+    : x1(x1N), y1(y1N), x2(x2N), y2(y2N) {
+    width = x2 - x1 + 1;
+    height = y2 - y1 + 1;
 }
 
-bool TraffPolygon::containsPoint(const TraffPoint &pt) const
-{
-	if (pointList.empty())
-		return false;
-
-	int winding_number(0);
-
-	TraffPoint last_pt = pointList[0];
-	TraffPoint last_start = pointList[0];
-	for (size_t ii = 1; ii < pointList.size(); ++ii)
-	{
-		const TraffPoint &e = pointList[ii];
-		isect_line(winding_number, last_pt, e, pt);
-		last_pt = e;
-	}
-
-	// implicitly close last subpath
-	if ((last_pt.x != last_start.x) && (last_pt.y != last_start.y))
-		isect_line(winding_number, last_pt, last_start, pt);
-
-	return ((winding_number % 2) != 0);
+void TraffPolygon::setPointList(const std::vector<TraffPoint> &list) {
+    this->pointList = list;
+    computeBoundingRect();
 }
 
-void TraffPolygon::isect_line(int &winding, const TraffPoint &p1, const TraffPoint &p2, const TraffPoint &pos) const
-{
-	float x1(p1.x), y1(p1.y), x2(p2.x), y2(p2.y), y(pos.y);
-	int dir(1);
-
-	if (fabs(y1 - y2) * 100000.f <= fmin(fabs(y1), fabs(y2)))
-	{
-		// ignore horizontal lines according to scan conversion rule
-		return;
-	}
-	else if (y2 < y1)
-	{
-		float tmp(x2);
-		x2 = x1; x1 = tmp;
-		tmp = y2;
-		y2 = y1; y1 = tmp;
-		dir = -1;
-	}
-
-	if (y >= y1 && y < y2)
-	{
-		float x = x1 + ((x2 - x1) / (y2 - y1)) * (y - y1);
-		// count up the winding number if we're
-		if (x <= pos.x)
-			winding += dir;
-	}
+TraffRect TraffPolygon::getBoundingRect() const {
+    return boundingRect;
 }
 
-void TraffPolygon::computeBoundingRect()
-{
-	if (pointList.empty())
-	{
-		boundingRect = TraffRect(0, 0, 0, 0);
-		return;
-	}
+bool TraffPolygon::containsPoint(const TraffPoint &pt) const {
+    if (pointList.empty()) return false;
+    // Быстрая проверка по Bounding Box
+    if (pt.x < boundingRect.x1 || pt.x > boundingRect.x2 || 
+        pt.y < boundingRect.y1 || pt.y > boundingRect.y2) return false;
 
-	TraffPoint p = pointList[0];
-	int minx(p.x), maxx(p.x), miny(p.y), maxy(p.y);
+    int winding_number = 0;
+    for (size_t i = 0; i < pointList.size(); ++i) {
+        const auto& p1 = pointList[i];
+        const auto& p2 = pointList[(i + 1) % pointList.size()];
+        isect_line(winding_number, p1, p2, pt);
+    }
+    return (winding_number % 2 != 0);
+}
 
-	for (size_t ii = 1; ii < pointList.size(); ++ii)
-	{
-		p = pointList[ii];
-		if (p.x < minx)
-			minx = p.x;
-		else if (p.x > maxx)
-			maxx = p.x;
-		if (p.y < miny)
-			miny = p.y;
-		else if (p.y > maxy)
-			maxy = p.y;
-	}
+void TraffPolygon::isect_line(int &winding, const TraffPoint &p1, const TraffPoint &p2, const TraffPoint &pos) const {
+    if ((p1.y <= pos.y && p2.y > pos.y) || (p2.y <= pos.y && p1.y > pos.y)) {
+        float vt = (float)(pos.y - p1.y) / (p2.y - p1.y);
+        if (pos.x < p1.x + vt * (p2.x - p1.x)) {
+            winding++;
+        }
+    }
+}
 
-	boundingRect = TraffRect(minx, miny, maxx, maxy);
+void TraffPolygon::computeBoundingRect() {
+    if (pointList.empty()) {
+        boundingRect = TraffRect();
+        return;
+    }
+    int minx = pointList[0].x, maxx = minx;
+    int miny = pointList[0].y, maxy = miny;
+    for (const auto& p : pointList) {
+        if (p.x < minx) minx = p.x; if (p.x > maxx) maxx = p.x;
+        if (p.y < miny) miny = p.y; if (p.y > maxy) maxy = p.y;
+    }
+    boundingRect = TraffRect(minx, miny, maxx, maxy);
 }

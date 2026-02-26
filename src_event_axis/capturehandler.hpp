@@ -1,33 +1,25 @@
 #pragma once
-
+#include "datastructs.hpp"
 #include <capture.h>
-#include "datastructs.h"
 
 class CaptureBase {
 protected:
     Frame data;
 public:
-    CaptureBase() {}
-    virtual ~CaptureBase() {}
+    virtual ~CaptureBase() = default;
     virtual void close() = 0;
-    virtual bool open(int frameW, int frameH) = 0;
-    virtual const Frame handle() = 0;
+    virtual bool open(int w, int h) = 0;
+    virtual Frame handle() = 0;
 };
 
 class CaptureY800 : public CaptureBase {
 private:
-    media_stream *source;
-    int w, h;
-
+    media_stream *source = nullptr;
+    int w = 0, h = 0;
 public:
-    CaptureY800();
-    ~CaptureY800();
-
+    CaptureY800() = default;
+    ~CaptureY800() override { close(); }
     void close() override;
     bool open(int frameW, int frameH) override;
-    const Frame handle() override;
-
-private:
-    CaptureY800(const CaptureY800&);
-    CaptureY800& operator=(const CaptureY800&);
+    Frame handle() override;
 };
