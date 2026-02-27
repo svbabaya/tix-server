@@ -8,6 +8,7 @@ include $(AXIS_TOP_DIR)/tools/build/rules/common.mak
 # 2. Ваши локальные пути
 LIBEVENT_DIR = $(CURDIR)/libs/build/libevent_mipsisa32r2el
 CJSON_DIR = $(CURDIR)/libs/cjson
+OPENCV_DIR = /mnt/c/viat/libs/opencv341/build.mipsisa32r2el/install
 
 # 3. Данные приложения
 APP_NAME := $(shell grep "MENUNAME" package.conf | cut -d'=' -f2 | tr -d '"')
@@ -21,31 +22,36 @@ APP_DEFS = -DAPP_NAME_STR=\"$(APP_NAME)\" -DAPP_VER_STR=\"$(APP_VER)\"
 # Мы добавляем ваши пути ПЕРЕД системными путями SDK
 COMMON_FLAGS = $(APP_DEFS) -Wall -Wextra -Werror -pedantic \
                -I$(LIBEVENT_DIR)/include \
-               -I$(CJSON_DIR)
+               -I$(CJSON_DIR) \
+			   -I$(OPENCV_DIR)/include
 
 # Используем CFLAGS/CXXFLAGS, которые уже частично заполнены правилами Axis
 # Фильтруем конфликтующие стандарты, если они прилетели из SDK
 CXXFLAGS := $(filter-out -std=c89 -std=c90 -ansi, $(CXXFLAGS))
-CXXFLAGS += $(COMMON_FLAGS) -std=c++11
-CFLAGS   += $(COMMON_FLAGS) -std=c89
+CXXFLAGS += $(COMMON_FLAGS) -std=c++11 -msoft-float -march=mips32r2 -EL
+CFLAGS   += $(COMMON_FLAGS) -std=c89 -msoft-float -march=mips32r2 -EL
 
 # 5. ЛИНКОВКА
 # Чтобы libevent нашелся, его путь должен быть первым в LDFLAGS
-LDFLAGS := -L$(LIBEVENT_DIR)/lib $(LDFLAGS)
+LDFLAGS := -L$(LIBEVENT_DIR)/lib -L$(OPENCV_DIR)/lib -L$(OPENCV_DIR)/share/OpenCV/3rdparty/lib $(LDFLAGS)
 # Пути к SDK из вашего Makefile (на всякий случай, если common.mak их не прописал)
 LDFLAGS += -L$(prefix)/lib -L$(prefix)/usr/lib
 
 # Добавляем rpath-link для разрешения зависимостей libcapture (glib, dbus и т.д.)
 LDFLAGS += -Wl,-rpath-link,$(prefix)/usr/lib:$(prefix)/lib
 
-LDLIBS = -levent -lpthread -lcapture -lrt -lm $(LIBS)
+# Минимальный набор для opencv2/core/core.hpp
+# Порядок: сначала OpenCV, потом зависимости (zlib), потом системные либы
+OPENCV_MIN_LIBS = -lopencv_core -lzlib
+
+LDLIBS = -levent $(OPENCV_MIN_LIBS) -lpthread -lcapture -lrt -lm -ldl $(LIBS)
 
 TARGET = tixerver
 
-CPPSRC = main.cpp camera_info.cpp network_server.cpp math_engine.cpp command_processor.cpp capturehandler.cpp rowMatClass.cpp
+CPPSRC = main.cpp camera_info.cpp network_server.cpp math_engine.cpp command_processor.cpp capturehandler.cpp rowMatClass.cpp traffcounter.cpp
 CSRC = $(CJSON_DIR)/cJSON.c
 
-OBJECTS = main.o camera_info.o network_server.o math_engine.o command_processor.o capturehandler.o rowMatClass.o cJSON.o
+OBJECTS = main.o camera_info.o network_server.o math_engine.o command_processor.o capturehandler.o rowMatClass.o traffcounter.o cJSON.o
 
 all: debug
 

@@ -85,3 +85,4 @@ public:
 
     inline size_t size() const { return empty() ? 0 : 1; }
 };
+ 
