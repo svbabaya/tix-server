@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 
 const int FRAME_WIDTH = 640;

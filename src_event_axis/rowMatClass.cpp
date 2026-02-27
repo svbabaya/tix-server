@@ -118,6 +118,7 @@ void TraffPolygon::isect_line(int &winding, const PointYX &p1, const PointYX &p2
 
 void TraffPolygon::computeBoundingRect() {
     if (pointList.empty()) { boundingRect = TraffRect(); return; }
+    // Исправлено: обращение к элементам вектора через [0]
     int minx = pointList[0].x, maxx = minx, miny = pointList[0].y, maxy = miny;
     for (const auto& p : pointList) {
         if (p.x < minx) minx = p.x; if (p.x > maxx) maxx = p.x;

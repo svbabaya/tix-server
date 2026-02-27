@@ -8,7 +8,6 @@ class CaptureBase {
 public:
     virtual ~CaptureBase() = default;
     virtual void close() = 0;
-    // Параметры по умолчанию теперь берутся из defaults.hpp
     virtual bool open(int w = FRAME_WIDTH, int h = FRAME_HEIGHT) = 0;
     virtual Frame handle() = 0;
 };
@@ -21,7 +20,6 @@ private:
 
 public:
     CaptureY800() = default;
-    // Деструктор необходим для автоматического вызова close()
     ~CaptureY800() override; 
 
     void close() override;
