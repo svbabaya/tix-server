@@ -38,9 +38,13 @@ void MathEngine::processing_loop(AppContext* ctx) {
             cfg.sensitivity = ctx->settings.sensitivity;
             pthread_mutex_unlock(&ctx->settings.lock);
 
+
+
             // 2. Анализируем кадр
             int result = analyze(frame, cfg);
 
+
+            
             // 3. Записываем результат
             pthread_mutex_lock(&ctx->results.lock);
             ctx->results.objects_detected = result;
