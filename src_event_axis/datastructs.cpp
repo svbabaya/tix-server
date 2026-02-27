@@ -1,137 +1,149 @@
-#include "datastructs.hpp"
-#include "utils_cam.h" // Предполагаем наличие i2str
-#include <fstream>
+#ifndef __ROWMAT_CLASS_H__
+#define __ROWMAT_CLASS_H__
+
+#include <vector>
 #include <cstring>
+#include <cmath>
+#include <cstdint>
 #include <algorithm>
 
-// --- CAMERA PARAMS ---
-CamParams::CamParams() {
-    FrameW = FRAME_WIDTH;
-    FrameH = FRAME_HEIGHT;
-    MAX_STATISTICS_FILE_SIZE_MB = MAX_STATISTICS_FILE_SIZE_MB_DEFAULT; 
-    RGB_FRAME = 0;
-    ID_CAM = "Traffic Detector";
-    CAPT_TYPE = "SDK";
-}
+// Безусловное включение OpenCV
+#include <opencv2/core/core.hpp>
 
-std::string CamParams::params2text(const CamParams &pars) {
-    std::string config, tmp;
-    config += "FrameW=" + i2str(pars.FrameW, tmp) + "\n";
-    config += "FrameH=" + i2str(pars.FrameH, tmp) + "\n";
-    config += "RGB_FRAME=" + i2str(pars.RGB_FRAME, tmp) + "\n";
-    config += "MAX_STATISTICS_FILE_SIZE_MB=" + i2str(pars.MAX_STATISTICS_FILE_SIZE_MB, tmp) + "\n";
-    config += "ID_CAM=" + pars.ID_CAM + "\n";
-    config += "CAPT_TYPE=" + pars.CAPT_TYPE + "\n";
-    return config;
-}
+typedef uint8_t uchar;
+typedef double _FloatType; 
 
-CamParams CamParams::readParamsFromFile(bool &isOpened, std::string fname) {
-    CamParams out;
-    isOpened = false;
-    std::ifstream file(fname);
-    if (file.is_open()) {
-        isOpened = true;
-        std::string row;
-        while (std::getline(file, row)) {
-            size_t eq = row.find('=');
-            if (eq == std::string::npos) continue;
-            std::string key = row.substr(0, eq);
-            std::string val = row.substr(eq + 1);
+// Координаты (Y, X) - полная интеграция с cv::Point
+struct PointYX {
+    int y, x;
+    PointYX() : y(0), x(0) {}
+    PointYX(int _y, int _x) : y(_y), x(_x) {}
+    PointYX(const cv::Point &cvPt) : y(cvPt.y), x(cvPt.x) {}
+    operator cv::Point() const { return cv::Point(x, y); }
+};
 
-            if (key == "FrameW") out.FrameW = std::stoi(val);
-            else if (key == "FrameH") out.FrameH = std::stoi(val);
-            else if (key == "RGB_FRAME") out.RGB_FRAME = std::stoi(val);
-            else if (key == "MAX_STATISTICS_FILE_SIZE_MB") out.MAX_STATISTICS_FILE_SIZE_MB = std::stoi(val);
-            else if (key == "ID_CAM") out.ID_CAM = val;
-            else if (key == "CAPT_TYPE") out.CAPT_TYPE = val;
+// Класс матрицы для Y800 (8-bit Gray)
+class RowMat {
+protected:
+    size_t *refcounter;
+    bool external_data;
+    uchar *data;
+    uchar **rows;
+    size_t hh, ww;
+
+    void cleanup() {
+        if (refcounter) {
+            if (--(*refcounter) == 0) {
+                if (!external_data && data) delete[] data;
+                if (rows) delete[] rows;
+                delete refcounter;
+            }
         }
+        refcounter = nullptr; data = nullptr; rows = nullptr;
+        external_data = false; hh = ww = 0;
     }
-    return out;
-}
 
-// --- DATA STORAGE (Frame) ---
-Frame::Frame() : rgb(false), yuv(false) {
-    t.tv_sec = 0;
-    t.tv_usec = 0;
-}
+public:
+    RowMat() : refcounter(nullptr), external_data(false), data(nullptr), rows(nullptr), hh(0), ww(0) {}
+    RowMat(size_t h, size_t w) : RowMat() { create(h, w); }
+    virtual ~RowMat() { cleanup(); }
 
-// Move constructor
-Frame::Frame(Frame&& other) noexcept 
-    : RowMatX<uchar>(std::move(other)), t(other.t), rgb(other.rgb), yuv(other.yuv) {}
-
-// Move assignment
-Frame& Frame::operator=(Frame&& other) noexcept {
-    if (this != &other) {
-        RowMatX<uchar>::operator=(std::move(other));
-        t = other.t;
-        rgb = other.rgb;
-        yuv = other.yuv;
+    // Конструктор копирования (Refcounting)
+    RowMat(const RowMat& other) {
+        refcounter = other.refcounter; external_data = other.external_data;
+        data = other.data; rows = other.rows; hh = other.hh; ww = other.ww;
+        if (refcounter) ++(*refcounter);
     }
-    return *this;
-}
 
-Frame Frame::clone() const {
-    Frame out;
-    out.reshape(this->height(), this->width()); 
-    if (!this->empty()) {
-        std::memcpy(out.data(), this->data(), this->height() * this->width());
+    // C++11 Move Constructor
+    RowMat(RowMat&& other) noexcept 
+        : refcounter(other.refcounter), external_data(other.external_data), 
+          data(other.data), rows(other.rows), hh(other.hh), ww(other.ww) {
+        other.refcounter = nullptr; other.data = nullptr; other.rows = nullptr;
+        other.hh = other.ww = 0;
     }
-    out.rgb = this->rgb;
-    out.yuv = this->yuv;
-    out.t = this->t;
-    return out;
-}
 
-// --- GEOMETRY ---
-TraffRect::TraffRect(int x1N, int y1N, int x2N, int y2N) noexcept
-    : x1(x1N), y1(y1N), x2(x2N), y2(y2N) {
-    width = x2 - x1 + 1;
-    height = y2 - y1 + 1;
-}
-
-void TraffPolygon::setPointList(const std::vector<TraffPoint> &list) {
-    this->pointList = list;
-    computeBoundingRect();
-}
-
-TraffRect TraffPolygon::getBoundingRect() const {
-    return boundingRect;
-}
-
-bool TraffPolygon::containsPoint(const TraffPoint &pt) const {
-    if (pointList.empty()) return false;
-    // Быстрая проверка по Bounding Box
-    if (pt.x < boundingRect.x1 || pt.x > boundingRect.x2 || 
-        pt.y < boundingRect.y1 || pt.y > boundingRect.y2) return false;
-
-    int winding_number = 0;
-    for (size_t i = 0; i < pointList.size(); ++i) {
-        const auto& p1 = pointList[i];
-        const auto& p2 = pointList[(i + 1) % pointList.size()];
-        isect_line(winding_number, p1, p2, pt);
-    }
-    return (winding_number % 2 != 0);
-}
-
-void TraffPolygon::isect_line(int &winding, const TraffPoint &p1, const TraffPoint &p2, const TraffPoint &pos) const {
-    if ((p1.y <= pos.y && p2.y > pos.y) || (p2.y <= pos.y && p1.y > pos.y)) {
-        float vt = (float)(pos.y - p1.y) / (p2.y - p1.y);
-        if (pos.x < p1.x + vt * (p2.x - p1.x)) {
-            winding++;
+    RowMat& operator=(const RowMat& other) {
+        if (this != &other) { cleanup();
+            refcounter = other.refcounter; external_data = other.external_data;
+            data = other.data; rows = other.rows; hh = other.hh; ww = other.ww;
+            if (refcounter) ++(*refcounter);
         }
+        return *this;
     }
-}
 
-void TraffPolygon::computeBoundingRect() {
-    if (pointList.empty()) {
-        boundingRect = TraffRect();
-        return;
+    RowMat& operator=(RowMat&& other) noexcept {
+        if (this != &other) { cleanup();
+            refcounter = other.refcounter; external_data = other.external_data;
+            data = other.data; rows = other.rows; hh = other.hh; ww = other.ww;
+            other.refcounter = nullptr; other.data = nullptr; other.rows = nullptr;
+            other.hh = other.ww = 0;
+        }
+        return *this;
     }
-    int minx = pointList[0].x, maxx = minx;
-    int miny = pointList[0].y, maxy = miny;
-    for (const auto& p : pointList) {
-        if (p.x < minx) minx = p.x; if (p.x > maxx) maxx = p.x;
-        if (p.y < miny) miny = p.y; if (p.y > maxy) maxy = p.y;
+
+    bool create(size_t h, size_t w) {
+        cleanup();
+        if (h == 0 || w == 0) return false;
+        hh = h; ww = w;
+        refcounter = new size_t(1);
+        data = new uchar[hh * ww](); 
+        rows = new uchar*[hh];
+        for (size_t i = 0; i < hh; ++i) rows[i] = data + i * ww;
+        return true;
     }
-    boundingRect = TraffRect(minx, miny, maxx, maxy);
-}
+
+    // Zero-copy из cv::Mat
+    bool fromCvMat(const cv::Mat& img, bool copydata = false) {
+        cleanup();
+        if (img.empty() || img.type() != CV_8UC1) return false;
+        hh = (size_t)img.rows; ww = (size_t)img.cols;
+        refcounter = new size_t(1);
+        if (copydata) {
+            external_data = false;
+            data = new uchar[hh * ww];
+            for (size_t y = 0; y < hh; ++y) 
+                std::memcpy(data + y * ww, img.ptr<uchar>(y), ww);
+        } else {
+            external_data = true;
+            data = const_cast<uchar*>(img.data);
+        }
+        rows = new uchar*[hh];
+        for (size_t i = 0; i < hh; ++i) rows[i] = data + i * ww;
+        return true;
+    }
+
+    // Представление для OpenCV (без копирования)
+    cv::Mat toCvView() const { 
+        return empty() ? cv::Mat() : cv::Mat((int)hh, (int)ww, CV_8UC1, data); 
+    }
+
+    RowMat clone() const {
+        RowMat out(hh, ww);
+        if (data && out.data) std::memcpy(out.data, data, hh * ww);
+        return out;
+    }
+
+    inline bool empty() const { return refcounter == nullptr; }
+    inline size_t height() const { return hh; }
+    inline size_t width() const { return ww; }
+    inline uchar* operator[](size_t y) { return rows[y]; }
+    inline const uchar* operator[](size_t y) const { return rows[y]; }
+    inline uchar* ptr() { return data; }
+
+    // Расчет яркости
+    void getMeanStdDev(_FloatType &mean, _FloatType &stdDev) const {
+        if (empty()) return;
+        double sum = 0, sq_sum = 0;
+        size_t total = hh * ww;
+        for (size_t i = 0; i < total; ++i) {
+            double v = (double)data[i];
+            sum += v; sq_sum += v * v;
+        }
+        mean = sum / total;
+        double var = (sq_sum / total) - (mean * mean);
+        stdDev = (var > 0) ? std::sqrt(var) : 0;
+    }
+};
+
+#endif

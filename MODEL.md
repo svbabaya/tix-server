@@ -1,14 +1,33 @@
 # camera-models
 ```mermaid
-architecture-beta
-    group api(cloud)[API]
+graph TD
+    subgraph SDK_Camera [SDK Камеры Axis]
+        RawData[Сырые байты в памяти SDK]
+        TS[Timestamp SDK]
+    end
 
-    service db(database)[Database] in api
-    service disk1(disk)[Storage] in api
-    service disk2(disk)[Storage] in api
-    service server(server)[Server] in api
+    subgraph CaptureHandler [Класс CaptureY800]
+        Stream[media_stream]
+        Handle[Метод handle]
+    end
 
-    db:L -- R:server
-    disk1:T -- B:server
-    disk2:T -- B:db
+    subgraph DataStructs [Класс Frame]
+        Buffer[Сплошной массив данных uchar]
+        Rows[Массив указателей на строки]
+        Time[struct timeval t]
+    end
+
+    subgraph Processing [Алгоритмы / OpenCV]
+        Detect[Детектор трафика]
+        Draw[Отрисовка cv::Mat]
+    end
+
+    %% Потоки данных
+    RawData -- memcpy --> Buffer
+    TS -- расчет --> Time
+    Handle -- возвращает --> DataStructs
+    
+    DataStructs -- operator[] --> Rows
+    Rows -- доступ к пикселям --> Detect
+    Buffer -- toCvView --> Draw
 ```

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __ROWMAT_CLASS_H__
+#define __ROWMAT_CLASS_H__
 
 #include <vector>
 #include <cstring>
@@ -6,6 +7,7 @@
 #include <cstdint>
 #include <algorithm>
 
+// Безусловное включение OpenCV
 #include <opencv2/core/core.hpp>
 
 typedef uint8_t uchar;
@@ -16,19 +18,17 @@ struct PointYX {
     int y, x;
     PointYX() : y(0), x(0) {}
     PointYX(int _y, int _x) : y(_y), x(_x) {}
-
-    // Конструкторы для мгновенного преобразования
     PointYX(const cv::Point &cvPt) : y(cvPt.y), x(cvPt.x) {}
     operator cv::Point() const { return cv::Point(x, y); }
 };
 
-template <typename TElem>
+// Класс матрицы для Y800 (8-bit Gray)
 class RowMat {
 protected:
     size_t *refcounter;
     bool external_data;
-    TElem *data;
-    TElem **rows;
+    uchar *data;
+    uchar **rows;
     size_t hh, ww;
 
     void cleanup() {
@@ -77,6 +77,7 @@ public:
             refcounter = other.refcounter; external_data = other.external_data;
             data = other.data; rows = other.rows; hh = other.hh; ww = other.ww;
             other.refcounter = nullptr; other.data = nullptr; other.rows = nullptr;
+            other.hh = other.ww = 0;
         }
         return *this;
     }
@@ -86,67 +87,63 @@ public:
         if (h == 0 || w == 0) return false;
         hh = h; ww = w;
         refcounter = new size_t(1);
-        data = new TElem[hh * ww](); 
-        rows = new TElem*[hh];
+        data = new uchar[hh * ww](); 
+        rows = new uchar*[hh];
         for (size_t i = 0; i < hh; ++i) rows[i] = data + i * ww;
         return true;
     }
 
-    // Создание RowMat из cv::Mat (Zero-copy по умолчанию)
+    // Zero-copy из cv::Mat
     bool fromCvMat(const cv::Mat& img, bool copydata = false) {
         cleanup();
-        if (img.empty()) return false;
-        hh = img.rows; ww = img.cols;
+        if (img.empty() || img.type() != CV_8UC1) return false;
+        hh = (size_t)img.rows; ww = (size_t)img.cols;
         refcounter = new size_t(1);
         if (copydata) {
             external_data = false;
-            data = new TElem[hh * ww];
+            data = new uchar[hh * ww];
             for (size_t y = 0; y < hh; ++y) 
-                std::memcpy(data + y * ww, img.ptr<TElem>(y), ww * sizeof(TElem));
+                std::memcpy(data + y * ww, img.ptr<uchar>(y), ww);
         } else {
             external_data = true;
-            data = (TElem*)img.data;
+            data = const_cast<uchar*>(img.data);
         }
-        rows = new TElem*[hh];
+        rows = new uchar*[hh];
         for (size_t i = 0; i < hh; ++i) rows[i] = data + i * ww;
         return true;
     }
 
-    // Обратное преобразование: RowMat -> cv::Mat (без копирования)
-    cv::Mat toCvView() { 
-        return empty() ? cv::Mat() : cv::Mat(hh, ww, cv::DataType<TElem>::type, data); 
+    // Представление для OpenCV (без копирования)
+    cv::Mat toCvView() const { 
+        return empty() ? cv::Mat() : cv::Mat((int)hh, (int)ww, CV_8UC1, data); 
     }
 
     RowMat clone() const {
         RowMat out(hh, ww);
-        if (data && out.data) std::memcpy(out.data, data, hh * ww * sizeof(TElem));
+        if (data && out.data) std::memcpy(out.data, data, hh * ww);
         return out;
     }
 
     inline bool empty() const { return refcounter == nullptr; }
     inline size_t height() const { return hh; }
     inline size_t width() const { return ww; }
-    inline TElem* operator[](size_t y) { return rows[y]; }
-    inline const TElem* operator[](size_t y) const { return rows[y]; }
-    inline TElem* ptr() { return data; }
+    inline uchar* operator[](size_t y) { return rows[y]; }
+    inline const uchar* operator[](size_t y) const { return rows[y]; }
+    inline uchar* ptr() { return data; }
+
+    // Расчет яркости
+    void getMeanStdDev(_FloatType &mean, _FloatType &stdDev) const {
+        if (empty()) return;
+        double sum = 0, sq_sum = 0;
+        size_t total = hh * ww;
+        for (size_t i = 0; i < total; ++i) {
+            double v = (double)data[i];
+            sum += v; sq_sum += v * v;
+        }
+        mean = sum / total;
+        double var = (sq_sum / total) - (mean * mean);
+        stdDev = (var > 0) ? std::sqrt(var) : 0;
+    }
 };
 
-// Контейнер каналов (наследник std::vector для Y800)
-template <typename TElem>
-class RowMatX {
-protected:
-    std::vector<RowMat<TElem>> mats;
-public:
-    RowMatX() = default;
-    virtual ~RowMatX() = default;
-    RowMatX(RowMatX&&) noexcept = default;
-    RowMatX& operator=(RowMatX&&) noexcept = default;
-
-    void release() { mats.clear(); }
-    void push(const RowMat<TElem>& m) { mats.push_back(m); }
-    void push(RowMat<TElem>&& m) { mats.push_back(std::move(m)); }
-    inline bool empty() const { return mats.empty(); }
-    inline size_t size() const { return mats.size(); }
-    inline RowMat<TElem>& operator[](size_t i) { return mats[i]; }
-    inline const RowMat<TElem>& operator[](size_t i) const { return mats[i]; }
-};
+#endif
