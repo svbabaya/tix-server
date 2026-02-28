@@ -15,7 +15,7 @@ void* MathEngine::run_thread(void* arg) {
 
 void MathEngine::processing_loop(AppContext* ctx) {
     CaptureY800 capturer;
-    TraffCounter traffixCounter; 
+    TraffCounter traffCounter; 
 
     if (!capturer.open(FRAME_WIDTH, FRAME_HEIGHT)) {
         syslog(LOG_ERR, "MathEngine: Capture open failed!");
@@ -30,15 +30,15 @@ void MathEngine::processing_loop(AppContext* ctx) {
         if (!frame.empty()) {
             // ШАГ 1: Забираем актуальный контекст настроек (быстро)
             pthread_mutex_lock(&ctx->settings.lock);
-            traffixCounter.updateSettings(ctx->settings);
+            traffCounter.updateSettings(ctx->settings);
             pthread_mutex_unlock(&ctx->settings.lock);
 
             // ШАГ 2: Обработка кадра и наполнение внутреннего состояния
             // Здесь происходит вся математика над RowMat
-            traffixCounter.processFrame(frame);
+            traffCounter.processFrame(frame);
             
             // ШАГ 3: Периодический сброс в глобальный контекст и логирование
-            traffixCounter.syncResultsIfNeeded(ctx->results);
+            traffCounter.syncResultsIfNeeded(ctx->results);
 
         } else {
             // Если кадр пустой — даем процессору MIPS "подышать"

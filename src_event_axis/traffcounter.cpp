@@ -2,9 +2,10 @@
 #include <syslog.h>
 #include <sys/time.h>
 #include <sys/statvfs.h>
-#include <fstream>
-#include <iomanip>
-#include <string>
+#include <unistd.h>   
+#include <fcntl.h>
+#include <cstdio>
+#include <cstring>
 
 /**
  * Конструктор: инициализация таймеров и резервирование RAM.
@@ -13,12 +14,12 @@ TraffCounter::TraffCounter()
     : totalObjects(0), currentScore(0.0), fileCounter(0) {
     lastSyncTime = getCurrentMillis();
     
-    // Резервируем память заранее для предотвращения фрагментации на MIPS
+    // Резервируем память для истории (учитываем лимиты MIPS)
     frameHistory.reserve(MAX_HISTORY_SIZE);
 }
 
 /**
- * Вспомогательный метод для получения времени в мс.
+ * Вспомогательный метод для времени.
  */
 long TraffCounter::getCurrentMillis() {
     struct timeval tv;
@@ -27,99 +28,114 @@ long TraffCounter::getCurrentMillis() {
 }
 
 /**
- * Snapshot настроек: копирование параметров из контекста во внутреннее состояние.
+ * Синхронизация: забираем Snapshot настроек из AppContext.
+ * Теперь работаем с GlobalConfig (список сенсоров).
  */
-void TraffCounter::updateSettings(const VideoSettings& cfg) {
-    internalSettings.threshold = cfg.threshold;
-    internalSettings.sensitivity = cfg.sensitivity;
+void TraffCounter::updateSettings(const GlobalConfig& cfg) {
+    // Копируем всю структуру со всеми сенсорами
+    this->internalConfig = cfg;
 }
 
 /**
- * Основная обработка: прямой доступ к RowMat и накопление данных.
+ * Основная обработка: итерируемся по всем активным сенсорам.
  */
 void TraffCounter::processFrame(const Frame& frame) {
-    if (frame.empty()) return;
+    // 1. Если кадра нет или сервер еще не прислал сенсоры — выходим
+    if (frame.empty() || internalConfig.sensors.empty()) {
+        return;
+    }
 
-    // Прямой доступ через RowMat: frame[y][x]
-    int h = frame.height();
-    int w = frame.width();
-    uchar pixelVal = frame[h / 2][w / 2];
+    // 2. Проходим по каждому сенсору в списке
+    for (const auto& sensor : internalConfig.sensors) {
+        
+        // ВАЖНО: Здесь будет ваша математика по зоне (sensor.zone)
+        // Для примера — берем только первую точку четырехугольника
+        int x = sensor.zone.p1.x;
+        int y = sensor.zone.p1.y;
 
-    // Логика обнаружения (имитация)
-    if (pixelVal > internalSettings.threshold) {
-        totalObjects++;
-        currentScore = (pixelVal / 255.0) * (internalSettings.sensitivity / 100.0);
+        // Безопасная проверка границ кадра
+        if (x >= frame.width() || y >= frame.height()) continue;
 
-        // Наполнение внутренней истории
-        if (frameHistory.size() < MAX_HISTORY_SIZE) {
-            frameHistory.push_back(pixelVal);
+        uchar pixelVal = frame[y][x];
+
+        // Используем параметры конкретно этого сенсора
+        if (pixelVal > sensor.params.binarizationThreshold) {
+            totalObjects++;
+            currentScore = (double)pixelVal / 255.0;
+
+            // Наполнение истории для отладки
+            if (frameHistory.size() < MAX_HISTORY_SIZE) {
+                frameHistory.push_back(pixelVal);
+            }
         }
+    }
 
-        // Триггер сохранения: каждые 500 событий
-        if (totalObjects > 0 && (totalObjects % 500 == 0)) {
-            saveHistoryToCSV();
-        }
+    // 3. Триггер сохранения истории (общий на все сенсоры)
+    if (totalObjects > 0 && (totalObjects % 500 == 0)) {
+        saveHistoryToCSV();
     }
 }
 
 /**
- * Редкая синхронизация (раз в секунду) с глобальным контекстом.
+ * Редкая синхронизация (раз в 10 секунд) с результатами в AppContext.
  */
 void TraffCounter::syncResultsIfNeeded(MathResults& globalResults) {
     long now = getCurrentMillis();
     
-    if (now - lastSyncTime >= syncIntervalMs) {
-        // Захват мьютекса результатов
+    if (now - lastSyncTime >= 10000) { // Используем 10000мс напрямую
         pthread_mutex_lock(&globalResults.lock);
         globalResults.objects_detected = totalObjects;
         globalResults.last_score = currentScore;
         pthread_mutex_unlock(&globalResults.lock);
 
-        syslog(LOG_INFO, "[TraffCounter] Sync: Total=%d, SamplesInMem=%lu", 
-               totalObjects, (unsigned long)frameHistory.size());
+        syslog(LOG_INFO, "[TraffCounter] Sync: Total=%d, ActiveSensors=%lu", 
+               totalObjects, (unsigned long)internalConfig.sensors.size());
 
         lastSyncTime = now;
     }
 }
 
 /**
- * Сохранение в CSV с проверкой свободного места в /tmp/
+ * Сохранение в CSV с ротацией файлов и проверкой места.
  */
 void TraffCounter::saveHistoryToCSV() {
     if (frameHistory.empty()) return;
 
     const char* targetPath = "/tmp";
-    
-    // Проверка свободного места через statvfs
+    const int MAX_FILES = 5;
+
+    // 1. Ротация (удаление старых)
+    if (fileCounter >= MAX_FILES) {
+        char oldFileName[64];
+        snprintf(oldFileName, sizeof(oldFileName), "%s/traff_report_%d.csv", 
+                 targetPath, fileCounter - MAX_FILES);
+        unlink(oldFileName);
+    }
+
+    // 2. Проверка места на диске
     struct statvfs vfs;
     if (statvfs(targetPath, &vfs) == 0) {
         unsigned long long freeSpace = (unsigned long long)vfs.f_bsize * vfs.f_bavail;
-        // Если места меньше 500Кб — отменяем запись во избежание Kernel Panic/ошибок FS
-        if (freeSpace < 512 * 1024) {
-            syslog(LOG_WARNING, "[TraffCounter] Disk Full on %s: %lu KB left. Skipping CSV.", 
-                   targetPath, (unsigned long)(freeSpace / 1024));
-            return;
+        if (freeSpace < 256 * 1024) return;
+    }
+
+    // 3. Запись файла через POSIX (экономим RAM)
+    char fileName[64];
+    snprintf(fileName, sizeof(fileName), "%s/traff_report_%d.csv", targetPath, fileCounter++);
+    
+    int fd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd >= 0) {
+        const char* header = "ID,Value\n";
+        write(fd, header, strlen(header));
+
+        char lineBuf[32];
+        for (size_t i = 0; i < frameHistory.size(); ++i) {
+            int len = snprintf(lineBuf, sizeof(lineBuf), "%lu,%d\n", 
+                               (unsigned long)i, (int)frameHistory[i]);
+            write(fd, lineBuf, len);
         }
+        close(fd);
     }
 
-    std::string fileName = std::string(targetPath) + "/traff_report_" + std::to_string(fileCounter++) + ".csv";
-    
-    std::ofstream fs(fileName);
-    if (!fs.is_open()) {
-        syslog(LOG_ERR, "[TraffCounter] Cannot open CSV: %s", fileName.c_str());
-        return;
-    }
-
-    fs << "ID,Value,Threshold\n";
-    for (size_t i = 0; i < frameHistory.size(); ++i) {
-        fs << i << "," << (int)frameHistory[i] << "," << internalSettings.threshold << "\n";
-    }
-
-    fs.close();
-    
-    syslog(LOG_NOTICE, "[TraffCounter] CSV Saved: %s (%lu samples)", 
-           fileName.c_str(), (unsigned long)frameHistory.size());
-
-    // Очистка истории после успешного сброса на "диск"
     frameHistory.clear();
 }

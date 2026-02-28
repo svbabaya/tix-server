@@ -2,47 +2,55 @@
 
 #include "app_context.hpp"
 #include "rowMatClass.hpp"
+#include "algo_params.hpp" // Наша новая структура с MathCoreParams и SensorConfig
 #include <vector>
-#include <sys/time.h>
 
 class TraffCounter {
 private:
-    // Внутренние настройки (Snapshot)
-    VideoSettings internalSettings;
+    // Внутренняя копия настроек (Snapshot)
+    // Хранит список сенсоров, их координаты и индивидуальные параметры
+    GlobalConfig internalConfig;
 
-    // Накопленные данные
+    // Накопленные данные для синхронизации
     int totalObjects = 0;
     double currentScore = 0.0;
     
-    // Имитация истории для анализа трендов (наполнение объекта)
-    // Ограничим размер, чтобы не исчерпать RAM на встроенной системе
+    // История для отладки (сохраняется в /tmp)
     std::vector<uchar> frameHistory;
     const size_t MAX_HISTORY_SIZE = 1000; 
 
-    // Таймер синхронизации
+    // Таймер синхронизации с AppContext
     long lastSyncTime;
     const long syncIntervalMs = 1000; // 1 секунда
 
-    // Вспомогательная функция времени
+    // Вспомогательный метод времени
     long getCurrentMillis();
 
-    const int SAVE_TRIGGER_COUNT = 500; // Сбрасывать в файл каждые 500 событий
+    // Параметры файлового лога
     int fileCounter = 0;
-    void saveHistoryToCSV(); // Приватный метод сохранения
+    void saveHistoryToCSV(); // Приватный метод записи через POSIX write
 
 public:
     TraffCounter();
     ~TraffCounter() = default;
 
-    // Копирование настроек из контекста во внутреннее состояние
-    void updateSettings(const VideoSettings& cfg);
+    /**
+     * Копирование настроек из контекста во внутреннее состояние.
+     * Вызывается перед обработкой кадра, если в AppContext обновились данные.
+     */
+    void updateSettings(const GlobalConfig& cfg);
 
-    // Основная математика над кадром (наполнение данными)
+    /**
+     * Основная обработка: итерируется по всем сенсорам в internalConfig.
+     */
     void processFrame(const Frame& frame);
 
-    // Сброс результатов в AppContext по таймеру с логированием
+    /**
+     * Безопасный сброс результатов в MathResults (под мьютексом).
+     */
     void syncResultsIfNeeded(MathResults& globalResults);
 
-    // Геттеры для внутреннего использования (если понадобятся)
+    // Геттеры
     int getTotalCount() const { return totalObjects; }
+    size_t getActiveSensorsCount() const { return internalConfig.sensors.size(); }
 };

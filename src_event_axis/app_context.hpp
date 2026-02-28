@@ -2,23 +2,46 @@
 
 #include "camera_info.hpp"
 #include "command_processor.hpp"
+#include "algo_params.hpp" // Вынесли структуры параметров сюда
 
 #include <pthread.h>
-#include <string>
+#include <vector>
 
-// Настройки для математического модуля (меняются через POST)
-struct VideoSettings {
-    int threshold;
-    int sensitivity;
+/**
+ * Глобальный контейнер для параметров алгоритма.
+ * Защищен мьютексом, так как обновляется из сетевого потока (CommandProcessor),
+ * а читается из потока обработки видео (TraffCounter).
+ */
+struct AlgoSettings {
+    GlobalConfig config;      // Наша структура с вектором сенсоров и MathCoreParams
     pthread_mutex_t lock;
 
-    VideoSettings() : threshold(10), sensitivity(50) {
+    AlgoSettings() {
         pthread_mutex_init(&lock, NULL);
     }
-    ~VideoSettings() { pthread_mutex_destroy(&lock); }
+    ~AlgoSettings() {
+        pthread_mutex_destroy(&lock);
+    }
+
+    // Вспомогательный метод для безопасного копирования "снимка" настроек
+    GlobalConfig getSnapshot() {
+        pthread_mutex_lock(&lock);
+        GlobalConfig copy = config;
+        pthread_mutex_unlock(&lock);
+        return copy;
+    }
+
+    // Безопасное обновление данных (вызывается при получении команды с сервера)
+    void update(const GlobalConfig& newConfig) {
+        pthread_mutex_lock(&lock);
+        config = newConfig;
+        pthread_mutex_unlock(&lock);
+    }
 };
 
-// Результаты обработки видео (отдаются через TCP)
+/**
+ * Результаты обработки (то, что уходит клиенту по TCP)
+ */
 struct MathResults {
     int objects_detected;
     double last_score;
@@ -27,16 +50,20 @@ struct MathResults {
     MathResults() : objects_detected(0), last_score(0.0) {
         pthread_mutex_init(&lock, NULL);
     }
-    ~MathResults() { pthread_mutex_destroy(&lock); }
+    ~MathResults() {
+        pthread_mutex_destroy(&lock);
+    }
 };
 
-// Глобальный контекст
+/**
+ * Глобальный контекст приложения
+ */
 struct AppContext {
-    struct event_base* base;
-    VideoSettings settings;
-    MathResults results;
-    CameraInfo info;
-    CommandProcessor processor;
+    struct event_base* base;    // Для libevent
+    AlgoSettings algoSettings;  // Настройки алгоритма
+    MathResults results;        // Текущая статистика
+    CameraInfo info;            // Данные о камере Axis
+    CommandProcessor processor; // Обработчик команд
 
-    AppContext(struct event_base* b) : base(b) {}
+    AppContext(struct event_base* b) : base(b), processor() {}
 };
