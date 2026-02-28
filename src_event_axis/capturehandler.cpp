@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstring>
 
-CaptureY800::~CaptureY800() {
+CaptureY800::~CaptureY800() noexcept {
     close();
 }
 
@@ -58,6 +58,7 @@ Frame CaptureY800::handle() {
     }
     
     capture_frame_free(frame);
+    
     // Возвращаем объект (Refcounting / Move)
-    return data; 
+    return data.clone(); 
 }

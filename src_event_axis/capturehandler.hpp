@@ -6,7 +6,7 @@
 
 class CaptureBase {
 public:
-    virtual ~CaptureBase() = default;
+    virtual ~CaptureBase() noexcept = default;
     virtual void close() = 0;
     virtual bool open(int w = FRAME_WIDTH, int h = FRAME_HEIGHT) = 0;
     virtual Frame handle() = 0;
@@ -20,7 +20,7 @@ private:
 
 public:
     CaptureY800() = default;
-    ~CaptureY800() override; 
+    ~CaptureY800() noexcept override; 
 
     void close() override;
     bool open(int frameW = FRAME_WIDTH, int frameH = FRAME_HEIGHT) override;

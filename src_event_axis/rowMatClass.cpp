@@ -24,9 +24,14 @@ void RowMat::cleanup() {
             if (rows) delete[] rows;
             delete refcounter;
         }
+        refcounter = nullptr; data = nullptr; rows = nullptr;
+        hh = 0; ww = 0;
+        external_data = false;
     }
-    refcounter = nullptr; data = nullptr; rows = nullptr;
-    external_data = false; hh = ww = 0;
+}
+
+void RowMat::release() {
+    cleanup();
 }
 
 RowMat::RowMat(const RowMat& other) : refcounter(other.refcounter), external_data(other.external_data), 
@@ -117,12 +122,27 @@ void TraffPolygon::isect_line(int &winding, const PointYX &p1, const PointYX &p2
 }
 
 void TraffPolygon::computeBoundingRect() {
-    if (pointList.empty()) { boundingRect = TraffRect(); return; }
-    // Исправлено: обращение к элементам вектора через [0]
-    int minx = pointList[0].x, maxx = minx, miny = pointList[0].y, maxy = miny;
-    for (const auto& p : pointList) {
-        if (p.x < minx) minx = p.x; if (p.x > maxx) maxx = p.x;
-        if (p.y < miny) miny = p.y; if (p.y > maxy) maxy = p.y;
+    // 1. Проверяем, есть ли точки в полигоне
+    if (pointList.empty()) { 
+        boundingRect = TraffRect(); 
+        return; 
     }
+
+    // 2. Инициализируем min/max значениями первой точки
+    int minx = pointList[0].x;
+    int maxx = minx;
+    int miny = pointList[0].y;
+    int maxy = miny;
+
+    // 3. Проходим по остальным точкам (начиная со второй)
+    for (size_t i = 1; i < pointList.size(); ++i) {
+        const PointYX& p = pointList[i];
+        if (p.x < minx) minx = p.x;
+        if (p.x > maxx) maxx = p.x;
+        if (p.y < miny) miny = p.y;
+        if (p.y > maxy) maxy = p.y;
+    }
+
+    // 4. Сохраняем результат в прямоугольник
     boundingRect = TraffRect(minx, miny, maxx, maxy);
 }

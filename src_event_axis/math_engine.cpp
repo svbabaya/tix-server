@@ -1,5 +1,7 @@
 #include "math_engine.hpp"
+#include "traffcounter.hpp"
 #include "capturehandler.hpp"
+
 #include <unistd.h>
 #include <syslog.h>
 #include <sys/time.h>

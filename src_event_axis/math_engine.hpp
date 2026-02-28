@@ -1,8 +1,6 @@
 #pragma once
 
 #include "app_context.hpp"
-// #include "capturehandler.hpp"
-// #include "traffcounter.hpp"
 
 class MathEngine {
 public:

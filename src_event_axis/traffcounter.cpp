@@ -75,8 +75,8 @@ void TraffCounter::syncResultsIfNeeded(MathResults& globalResults) {
         globalResults.last_score = currentScore;
         pthread_mutex_unlock(&globalResults.lock);
 
-        syslog(LOG_INFO, "[TraffCounter] Sync: Total=%d, SamplesInMem=%zu", 
-               totalObjects, frameHistory.size());
+        syslog(LOG_INFO, "[TraffCounter] Sync: Total=%d, SamplesInMem=%lu", 
+               totalObjects, (unsigned long)frameHistory.size());
 
         lastSyncTime = now;
     }
@@ -96,8 +96,8 @@ void TraffCounter::saveHistoryToCSV() {
         unsigned long long freeSpace = (unsigned long long)vfs.f_bsize * vfs.f_bavail;
         // Если места меньше 500Кб — отменяем запись во избежание Kernel Panic/ошибок FS
         if (freeSpace < 512 * 1024) {
-            syslog(LOG_WARNING, "[TraffCounter] Disk Full on %s: %llu bytes left. Skipping CSV.", 
-                   targetPath, freeSpace);
+            syslog(LOG_WARNING, "[TraffCounter] Disk Full on %s: %lu KB left. Skipping CSV.", 
+                   targetPath, (unsigned long)(freeSpace / 1024));
             return;
         }
     }
@@ -117,8 +117,8 @@ void TraffCounter::saveHistoryToCSV() {
 
     fs.close();
     
-    syslog(LOG_NOTICE, "[TraffCounter] CSV Saved: %s (%zu samples)", 
-           fileName.c_str(), frameHistory.size());
+    syslog(LOG_NOTICE, "[TraffCounter] CSV Saved: %s (%lu samples)", 
+           fileName.c_str(), (unsigned long)frameHistory.size());
 
     // Очистка истории после успешного сброса на "диск"
     frameHistory.clear();

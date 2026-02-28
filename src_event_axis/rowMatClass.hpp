@@ -79,6 +79,10 @@ public:
     struct timeval t;
     
     Frame();
+
+    Frame(const Frame& other) = default; 
+    Frame& operator=(const Frame& other) = default;
+
     Frame(Frame&& other) noexcept;
     Frame& operator=(Frame&& other) noexcept;
     Frame clone() const;
