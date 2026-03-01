@@ -8,13 +8,21 @@
 #include <vector>
 #include <syslog.h>
 
+// Структура параметров захвата
+struct CaptureConfig {
+    int width = 640;
+    int height = 480;
+    int fps = 10;
+    std::string format = "Y800";
+};
+
 /**
  * Глобальный контейнер для параметров алгоритма.
  * Защищен мьютексом, так как обновляется из сетевого потока (CommandProcessor),
  * а читается из потока обработки видео (TraffCounter).
  */
 struct AlgoSettings {
-    GlobalConfig config;      // Наша структура с вектором сенсоров и MathCoreParams
+    GlobalConfig config; // Наша структура с вектором сенсоров и MathCoreParams
     pthread_mutex_t lock;
 
     AlgoSettings() {
@@ -69,6 +77,9 @@ struct AppContext {
     struct event_base* base;    // Для libevent
     AlgoSettings algoSettings;  // Настройки алгоритма
     MathResults results;        // Текущая статистика
+
+    CaptureConfig capConfig;    // Параметры захвата
+
     CameraInfo info;            // Данные о камере Axis
     CommandProcessor processor; // Обработчик команд
 

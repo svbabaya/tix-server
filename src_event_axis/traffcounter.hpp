@@ -3,6 +3,7 @@
 #include "app_context.hpp"
 #include "rowMatClass.hpp"
 #include "algo_params.hpp" // Наша новая структура с MathCoreParams и SensorConfig
+
 #include <vector>
 
 class TraffCounter {

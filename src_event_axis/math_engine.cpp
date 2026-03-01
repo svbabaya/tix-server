@@ -3,8 +3,6 @@
 
 
 
-#include "defaults.hpp"
-
 #include "capture_axis.hpp"
 
 
@@ -29,7 +27,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
     CaptureAxis capturer;
 
     // Используем константы разрешения из камеры Axis
-    if (!capturer.open(FRAME_WIDTH, FRAME_HEIGHT)) {
+    if (!capturer.open(ctx->capConfig)) {
         syslog(LOG_ERR, "MathEngine: Capture open failed!");
         return;
     }

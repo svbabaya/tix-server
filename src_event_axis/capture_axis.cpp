@@ -1,9 +1,5 @@
 #include "capture_axis.hpp"
 
-
-#include "defaults.hpp"
-
-
 #include <cstdio>
 #include <cstring>
 
@@ -18,25 +14,23 @@ void CaptureAxis::close() {
     h = 0;
 }
 
-bool CaptureAxis::open(int frameW, int frameH) {
+bool CaptureAxis::open(const CaptureConfig& cfg) {
     close();
-    w = frameW; h = frameH;
+    w = cfg.width; 
+    h = cfg.height;
 
     char cap_prop[128];
-    // Используем CAPTURE_FORMAT и CAPTURE_FPS из defaults.hpp
+    // Все данные берем из переданной структуры cfg
     std::snprintf(cap_prop, sizeof(cap_prop), 
                  "resolution=%dx%d&sdk_format=%s&fps=%d", 
-                 w, h, CAPTURE_FORMAT.c_str(), CAPTURE_FPS);
+                 w, h, cfg.format.c_str(), cfg.fps);
 
     source = capture_open_stream(IMAGE_UNCOMPRESSED, cap_prop);
     
-    if (!source) {
-        // Лог ошибки, если SDK не приняло параметры
-        return false;
-    }
-
+    if (!source) return false;
     return data.create(h, w);
 }
+
 
 Frame CaptureAxis::handle() {
     if (!source) return Frame();

@@ -1,4 +1,5 @@
 #include "rowMatClass.hpp"
+
 #include <cstring>
 #include <algorithm>
 
