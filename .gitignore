@@ -4,6 +4,7 @@
 .eap-install.cfg
 .target-makefrag
 *.eap
+.vscode
 
 # Prerequisites
 *.d

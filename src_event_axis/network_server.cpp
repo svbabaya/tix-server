@@ -35,37 +35,31 @@ void http_get_info_cb(struct evhttp_request* req, void* arg) {
 }
 
 // POST /api/settings -> Обновление MathSettings
-void http_post_settings_cb(struct evhttp_request* req, void* arg) {
+void http_post_settings_cb(struct evhttp_request *req, void *arg) {
     AppContext* ctx = (AppContext*)arg;
-    if (evhttp_request_get_command(req) != EVHTTP_REQ_POST) {
-        evhttp_send_error(req, HTTP_BADMETHOD, "POST only");
-        return;
-    }
+    
+    // 1. Получаем тело POST-запроса (JSON-строку)
+    struct evbuffer *in_evb = evhttp_request_get_input_buffer(req);
+    size_t len = evbuffer_get_length(in_evb);
+    char *json_data = (char*)malloc(len + 1);
+    evbuffer_copyout(in_evb, json_data, len);
+    json_data[len] = '\0';
 
-    struct evbuffer* in_buf = evhttp_request_get_input_buffer(req);
-    size_t len = evbuffer_get_length(in_buf);
-    if (len > 0) {
-        char* raw = (char*)malloc(len + 1);
-        evbuffer_remove(in_buf, raw, len);
-        raw[len] = '\0';
+    // 2. Парсим в структуру
+    GlobalConfig newConfig = parseJsonToConfig(json_data);
+    free(json_data);
 
-        cJSON* root = cJSON_Parse(raw);
-        if (root) {
-            pthread_mutex_lock(&ctx->settings.lock);
-            cJSON* thr = cJSON_GetObjectItemCaseSensitive(root, "threshold");
-            if (cJSON_IsNumber(thr)) ctx->settings.threshold = thr->valueint;
-            
-            cJSON* sen = cJSON_GetObjectItemCaseSensitive(root, "sensitivity");
-            if (cJSON_IsNumber(sen)) ctx->settings.sensitivity = sen->valueint;
-            pthread_mutex_unlock(&ctx->settings.lock);
+    // 3. Обновляем контекст (используем метод update, который мы добавили ранее)
+    // Это атомарно заменяет старые настройки новыми под мьютексом
+    ctx->algoSettings.update(newConfig);
 
-            syslog(LOG_INFO, "Settings updated via HTTP");
-            cJSON_Delete(root);
-        }
-        free(raw);
-    }
-    evhttp_send_reply(req, HTTP_OK, "OK", NULL);
+    // 4. Отправляем ответ серверу
+    struct evbuffer *out_evb = evbuffer_new();
+    evbuffer_add_printf(out_evb, "{\"status\":\"ok\"}");
+    evhttp_send_reply(req, 200, "OK", out_evb);
+    evbuffer_free(out_evb);
 }
+
 
 // --- TCP Обработчики ---
 
