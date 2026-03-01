@@ -7,6 +7,7 @@
 
 #include <pthread.h>
 #include <vector>
+#include <atomic>
 #include <syslog.h>
 
 /**
@@ -76,5 +77,11 @@ struct AppContext {
     CameraInfo info;            // Данные о камере Axis
     CommandProcessor processor; // Обработчик команд
 
+    // Флаг работы приложения
+    std::atomic<bool> running{true};
+
     AppContext(struct event_base* b) : base(b), processor() {}
+    
+    // Метод для остановки
+    void stop() { running.store(false); }
 };

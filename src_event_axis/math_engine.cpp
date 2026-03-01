@@ -34,7 +34,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
 
     syslog(LOG_NOTICE, "MathEngine: Processing started (Multi-Sensor Mode)");
 
-    while (true) {
+    while (ctx->running.load()) {
         Frame frame = capturer.handle();
         
         if (!frame.empty()) {
@@ -56,4 +56,8 @@ void MathEngine::processing_loop(AppContext* ctx) {
             usleep(20000); 
         }
     }
+
+    // СЮДА поток попадет ТОЛЬКО после получения сигнала
+    syslog(LOG_NOTICE, "MathEngine: Thread exiting gracefully.");
+    capturer.close(); // Явное закрытие ресурсов видео
 }

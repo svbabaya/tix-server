@@ -1,63 +1,73 @@
 #include <pthread.h>
 #include <syslog.h>
 #include <event2/event.h>
+#include <signal.h>
 
 #include "app_context.hpp"
 #include "network_server.hpp"
 #include "math_engine.hpp"
+#include "system_constants.hpp"
+
+// Глобальный указатель для доступа из обработчика сигналов
+static AppContext* g_ctx = nullptr;
+
+void signal_handler(int sig) {
+    if (g_ctx) {
+        syslog(LOG_NOTICE, "Signal %d received: stopping...", sig);
+        g_ctx->stop(); // Флаг для MathEngine
+        
+        if (g_ctx->base) {
+            // Останавливаем сетевой цикл libevent
+            event_base_loopbreak(g_ctx->base); 
+        }
+    }
+}
 
 int main() {
     openlog("TiXerver", LOG_PID | LOG_CONS, LOG_USER);
+    syslog(LOG_NOTICE, "TiXerver version 1.0 starting...");
 
-    // daemon(nochdir, noclose)
-    // 0, 0 означает: перейти в корень и закрыть stdout/stderr/stdin
-    // if (daemon(0, 0) == -1) {
-    //     syslog(LOG_ERR, "Failed to become a daemon");
-    //     return 1;
-    // }
-
-    // 1. Инициализация базового цикла libevent
+    // 1. Инициализация libevent
     struct event_base* base = event_base_new();
     if (!base) {
-        syslog(LOG_CRIT, "Failed to initialize libevent base!");
+        syslog(LOG_CRIT, "Failed to initialize libevent!");
         return 1;
     }
 
-    // 2. Создание единого контекста данных (Shared Context)
-    // Передаем указатель на base, чтобы сервер мог регистрировать события
+    // 2. Создание контекста и СВЯЗЬ с глобальным указателем
     AppContext app(base);
-    
-    // Заполняем статичные данные о камере при старте или делаем это при каждом запросе, поскольку не все данные статичные
-    // app.info = InfoCollector::collect(); 
+    g_ctx = &app;
 
-    // 3. Запуск сетевого модуля (HTTP: 8085, TCP: 8095)
-    // Сервер получает указатель на app, чтобы менять настройки и читать результаты
+    // 3. Настройка сигналов
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
+
+    // 4. Запуск сетевых служб
     if (!NetworkServer::start(&app, 8085, 8095)) {
-        syslog(LOG_CRIT, "Failed to start network services!");
+        syslog(LOG_CRIT, "Failed to start NetworkServer!");
         event_base_free(base);
         return 1;
     }
 
-    // 4. Запуск математического модуля в отдельном потоке
+    // 5. Запуск математического потока
     pthread_t math_thread_id;
-    // Передаем &app как аргумент, чтобы поток имел доступ к настройкам и буферу данных
     if (pthread_create(&math_thread_id, NULL, MathEngine::run_thread, (void*)&app) != 0) {
-        syslog(LOG_CRIT, "Failed to create math processing thread!");
+        syslog(LOG_CRIT, "Failed to create MathEngine thread!");
         event_base_free(base);
         return 1;
     }
 
-    // Отсоединяем поток, если не планируем делать pthread_join в конце, 
-    // либо оставляем так, чтобы завершить корректно при выходе из цикла.
-    pthread_detach(math_thread_id);
+    syslog(LOG_INFO, "TiXerver running. HTTP: 8085, TCP: 8095");
 
-    syslog(LOG_INFO, "TiXerver fully initialized. Network and Math modules are running.");
-
-    // 5. Вход в основной цикл обработки сетевых событий
-    // Этот вызов блокирует текущий (основной) поток.
+    // 6. Вход в сетевой цикл (БЛОКИРУЮЩИЙ ВЫЗОВ)
+    // Основной поток "живет" здесь, пока не придет сигнал
     event_base_dispatch(base);
 
-    // Точка выхода (сработает при остановке event_base)
+    // 7. ОСТАНОВКА: Сюда попадем только после signal_handler -> loopbreak
+    syslog(LOG_NOTICE, "Waiting for MathEngine to finish...");
+    pthread_join(math_thread_id, NULL); // Теперь это в правильном месте
+
+    syslog(LOG_NOTICE, "TiXerver stopped gracefully.");
     event_base_free(base);
     closelog();
 
