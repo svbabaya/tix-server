@@ -1,6 +1,7 @@
 #include "math_engine.hpp"
 #include "traffcounter.hpp"
 #include "capturehandler.hpp"
+#include "algo_params.hpp"
 
 #include <unistd.h>
 #include <syslog.h>
@@ -17,31 +18,33 @@ void MathEngine::processing_loop(AppContext* ctx) {
     CaptureY800 capturer;
     TraffCounter traffCounter; 
 
+    // Используем константы разрешения из камеры Axis
     if (!capturer.open(FRAME_WIDTH, FRAME_HEIGHT)) {
         syslog(LOG_ERR, "MathEngine: Capture open failed!");
         return;
     }
 
-    syslog(LOG_NOTICE, "MathEngine: Processing started (SyncInterval: 1s)");
+    syslog(LOG_NOTICE, "MathEngine: Processing started (Multi-Sensor Mode)");
 
     while (true) {
         Frame frame = capturer.handle();
         
         if (!frame.empty()) {
-            // ШАГ 1: Забираем актуальный контекст настроек (быстро)
-            pthread_mutex_lock(&ctx->settings.lock);
-            traffCounter.updateSettings(ctx->settings);
-            pthread_mutex_unlock(&ctx->settings.lock);
+            // ШАГ 1: Забираем актуальный снимок настроек (Snapshot)
+            // Метод getSnapshot() сам внутри захватывает и отпускает мьютекс
+            GlobalConfig currentCfg = ctx->algoSettings.getSnapshot();
+            
+            // ШАГ 2: Передаем весь конфиг (со списком сенсоров) в TraffCounter
+            traffCounter.updateSettings(currentCfg);
 
-            // ШАГ 2: Обработка кадра и наполнение внутреннего состояния
-            // Здесь происходит вся математика над RowMat
+            // ШАГ 3: Обработка кадра (теперь итерируется по всем сенсорам внутри)
             traffCounter.processFrame(frame);
             
-            // ШАГ 3: Периодический сброс в глобальный контекст и логирование
+            // ШАГ 4: Синхронизация результатов в AppContext под мьютексом результатов
             traffCounter.syncResultsIfNeeded(ctx->results);
 
         } else {
-            // Если кадр пустой — даем процессору MIPS "подышать"
+            // Разгрузка CPU MIPS при отсутствии кадров
             usleep(20000); 
         }
     }

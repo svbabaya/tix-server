@@ -54,7 +54,10 @@ void TraffCounter::processFrame(const Frame& frame) {
         int y = sensor.zone.p1.y;
 
         // Безопасная проверка границ кадра
-        if (x >= frame.width() || y >= frame.height()) continue;
+        // Если значения могут быть отрицательными (защита от мусора):
+        if (x < 0 || x >= (int)frame.width() || y < 0 || y >= (int)frame.height()) {
+            continue;
+        }
 
         uchar pixelVal = frame[y][x];
 
