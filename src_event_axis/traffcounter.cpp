@@ -1,11 +1,12 @@
 #include "traffcounter.hpp"
-#include <syslog.h>
+
 #include <sys/time.h>
 #include <sys/statvfs.h>
 #include <unistd.h>   
 #include <fcntl.h>
 #include <cstdio>
 #include <cstring>
+#include <syslog.h>
 
 /**
  * Конструктор: инициализация таймеров и резервирование RAM.
@@ -32,7 +33,16 @@ long TraffCounter::getCurrentMillis() {
  * Теперь работаем с GlobalConfig (список сенсоров).
  */
 void TraffCounter::updateSettings(const GlobalConfig& cfg) {
-    // Копируем всю структуру со всеми сенсорами
+
+    /*** Debug */
+    // Если количество сенсоров изменилось или это первая загрузка
+    if (this->internalConfig.sensors.size() != cfg.sensors.size()) {
+        syslog(LOG_NOTICE, "[TraffCounter] Local config updated: %lu -> %lu sensors", 
+               (unsigned long)this->internalConfig.sensors.size(), 
+               (unsigned long)cfg.sensors.size());
+    }
+    /*** end Debug */
+
     this->internalConfig = cfg;
 }
 
@@ -40,6 +50,20 @@ void TraffCounter::updateSettings(const GlobalConfig& cfg) {
  * Основная обработка: итерируемся по всем активным сенсорам.
  */
 void TraffCounter::processFrame(const Frame& frame) {
+
+    /*** Debug */
+    static bool firstRunAfterConfig = false;
+    if (internalConfig.sensors.empty()) {
+        firstRunAfterConfig = true;
+        return;
+    }
+    if (firstRunAfterConfig) {
+        syslog(LOG_INFO, "[TraffCounter] Processing FIRST frame with sensor ID: %d (Thr: %d)", 
+               internalConfig.sensors[0].id, internalConfig.sensors[0].params.binarizationThreshold);
+        firstRunAfterConfig = false;
+    }
+    /*** end Debug */
+
     // 1. Если кадра нет или сервер еще не прислал сенсоры — выходим
     if (frame.empty() || internalConfig.sensors.empty()) {
         return;

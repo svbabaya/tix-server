@@ -6,6 +6,7 @@
 
 #include <pthread.h>
 #include <vector>
+#include <syslog.h>
 
 /**
  * Глобальный контейнер для параметров алгоритма.
@@ -35,6 +36,12 @@ struct AlgoSettings {
     void update(const GlobalConfig& newConfig) {
         pthread_mutex_lock(&lock);
         config = newConfig;
+
+        /*** Debug */
+        syslog(LOG_NOTICE, "[AppContext] Config updated. New sensors: %lu", 
+           (unsigned long)config.sensors.size());
+        /*** end Debug */
+
         pthread_mutex_unlock(&lock);
     }
 };

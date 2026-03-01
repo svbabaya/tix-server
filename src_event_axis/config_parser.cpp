@@ -1,5 +1,7 @@
-#include <cJSON.h>
 #include "algo_params.hpp"
+
+#include <cJSON.h>
+#include <syslog.h>
 
 GlobalConfig parseJsonToConfig(const char* jsonString) {
     GlobalConfig cfg;
@@ -86,5 +88,15 @@ GlobalConfig parseJsonToConfig(const char* jsonString) {
     }
 
     cJSON_Delete(root);
+
+    /*** Debug */
+    syslog(LOG_INFO, "[Parser] JSON parsed: mainInterval=%d, sensorsCount=%lu", 
+       cfg.mainIntervalMsec, (unsigned long)cfg.sensors.size());
+    if (!cfg.sensors.empty()) {
+    syslog(LOG_DEBUG, "[Parser] First sensor ID: %d, Thr: %d, P1: (%d,%d)", 
+           cfg.sensors[0].id, cfg.sensors[0].params.binarizationThreshold,
+           cfg.sensors[0].zone.p1.x, cfg.sensors[0].zone.p1.y);
+    } /*** end Debug */
+
     return cfg;
 }
