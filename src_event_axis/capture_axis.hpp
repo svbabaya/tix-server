@@ -1,0 +1,20 @@
+#pragma once
+
+#include "capture_base.hpp"
+#include <capture.h>
+
+class CaptureAxis : public CaptureBase {
+private:
+    media_stream *source = nullptr;
+    Frame data; 
+    int w = 0, h = 0;
+
+public:
+    virtual ~CaptureAxis() noexcept {
+        close();
+    }
+
+    bool open(int frameW, int frameH) override;
+    void close() override;
+    Frame handle() override;
+};

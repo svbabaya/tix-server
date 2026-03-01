@@ -48,10 +48,10 @@ LDLIBS = -levent $(OPENCV_MIN_LIBS) -lpthread -lcapture -lrt -lm -ldl $(LIBS)
 
 TARGET = tixerver
 
-CPPSRC = main.cpp camera_info.cpp network_server.cpp math_engine.cpp command_processor.cpp capturehandler.cpp rowMatClass.cpp traffcounter.cpp config_parser.cpp
+CPPSRC = main.cpp camera_info.cpp network_server.cpp math_engine.cpp command_processor.cpp capture_axis.cpp rowMatClass.cpp traffcounter.cpp config_parser.cpp
 CSRC = $(CJSON_DIR)/cJSON.c
 
-OBJECTS = main.o camera_info.o network_server.o math_engine.o command_processor.o capturehandler.o rowMatClass.o traffcounter.o config_parser.o cJSON.o
+OBJECTS = main.o camera_info.o network_server.o math_engine.o command_processor.o capture_axis.o rowMatClass.o traffcounter.o config_parser.o cJSON.o
 
 all: debug
 

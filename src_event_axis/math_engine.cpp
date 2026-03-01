@@ -1,6 +1,14 @@
 #include "math_engine.hpp"
 #include "traffcounter.hpp"
-#include "capturehandler.hpp"
+
+
+
+#include "defaults.hpp"
+
+#include "capture_axis.hpp"
+
+
+
 #include "algo_params.hpp"
 
 #include <unistd.h>
@@ -15,8 +23,10 @@ void* MathEngine::run_thread(void* arg) {
 }
 
 void MathEngine::processing_loop(AppContext* ctx) {
-    CaptureY800 capturer;
-    TraffCounter traffCounter; 
+
+    TraffCounter traffCounter;
+
+    CaptureAxis capturer;
 
     // Используем константы разрешения из камеры Axis
     if (!capturer.open(FRAME_WIDTH, FRAME_HEIGHT)) {
