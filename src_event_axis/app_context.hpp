@@ -1,20 +1,13 @@
 #pragma once
 
 #include "camera_info.hpp"
+#include "capture_config.hpp"
 #include "command_processor.hpp"
 #include "algo_params.hpp"
 
 #include <pthread.h>
 #include <vector>
 #include <syslog.h>
-
-// Структура параметров захвата
-struct CaptureConfig {
-    int width = 640;
-    int height = 480;
-    int fps = 10;
-    std::string format = "Y800";
-};
 
 /**
  * Глобальный контейнер для параметров алгоритма.
