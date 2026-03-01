@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MATH_ENGINE_HPP
+#define MATH_ENGINE_HPP
 
 #include "app_context.hpp"
 
@@ -9,3 +10,5 @@ public:
 private:
     static void processing_loop(AppContext* ctx);
 };
+
+#endif // MATH_ENGINE_HPP

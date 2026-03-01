@@ -1,4 +1,5 @@
-#pragma once
+#ifndef APP_CONTEXT_HPP
+#define APP_CONTEXT_HPP
 
 #include "camera_info.hpp"
 #include "capture_config.hpp"
@@ -85,3 +86,5 @@ struct AppContext {
     // Метод для остановки
     void stop() { running.store(false); }
 };
+
+#endif // APP_CONTEXT_HPP

@@ -1,6 +1,8 @@
-#pragma once
+#ifndef CAPTURE_AXIS_HPP
+#define CAPTURE_AXIS_HPP
 
 #include "capture_base.hpp"
+
 #include <capture.h>
 
 class CaptureAxis : public CaptureBase {
@@ -18,3 +20,5 @@ public:
     void close() override;
     Frame handle() override;
 };
+
+#endif // CAPTURE_AXIS_HPP

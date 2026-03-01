@@ -1,8 +1,9 @@
-#pragma once
+#ifndef TRAFFCOUNTER_HPP
+#define TRAFFCOUNTER_HPP
 
 #include "app_context.hpp"
 #include "rowMatClass.hpp"
-#include "algo_params.hpp" // Наша новая структура с MathCoreParams и SensorConfig
+#include "algo_params.hpp"
 
 #include <vector>
 
@@ -55,3 +56,5 @@ public:
     int getTotalCount() const { return totalObjects; }
     size_t getActiveSensorsCount() const { return internalConfig.sensors.size(); }
 };
+
+#endif // TRAFFCOUNTER_HPP

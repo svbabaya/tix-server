@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMMAND_PROCESSOR_HPP
+#define COMMAND_PROCESSOR_HPP
 
 #include <string>
 #include <map>
@@ -26,3 +27,5 @@ private:
     static std::string handleGK(AppContext* ctx);
     static std::string handleGL(AppContext* ctx);
 };
+
+#endif // COMMAND_PROCESSOR_HPP

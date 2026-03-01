@@ -1,7 +1,9 @@
-#pragma once
+#ifndef ROWMATCLASS_HPP
+#define ROWMATCLASS_HPP
 
 #include <vector>
 #include <cstdint>
+
 #include <sys/time.h>
 #include <opencv2/core/core.hpp>
 
@@ -90,3 +92,4 @@ public:
     inline size_t size() const { return empty() ? 0 : 1; }
 };
  
+#endif // ROWMATCLASS_HPP

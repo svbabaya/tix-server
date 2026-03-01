@@ -1,7 +1,7 @@
-#pragma once
+#ifndef CAPTURE_BASE_HPP
+#define CAPTURE_BASE_HPP
 
 #include "rowMatClass.hpp"
-
 #include "capture_config.hpp"
 
 class CaptureBase {
@@ -11,3 +11,5 @@ public:
     virtual bool open(const CaptureConfig& cfg) = 0;
     virtual Frame handle() = 0;
 };
+
+#endif // CAPTURE_BASE_HPP

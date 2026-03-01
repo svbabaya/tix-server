@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CAPTURE_STUB_HPP
+#define CAPTURE_STUB_HPP
 
 #include "capture_base.hpp"
 
@@ -9,3 +10,5 @@ public:
     void close() override {}
     Frame handle() override { return Frame(); } // Пустой кадр
 };
+
+#endif // CAPTURE_STUB_HPP

@@ -1,7 +1,12 @@
-#pragma once
+#ifndef ALGO_PARAMS_HPP
+#define ALGO_PARAMS_HPP
+
 #include <vector>
 
-struct Point { int x = 0; int y = 0; };
+struct Point { 
+    int x = 0; 
+    int y = 0; 
+};
 
 struct Quadrilateral {
     Point p1, p2, p3, p4;
@@ -56,3 +61,5 @@ struct GlobalConfig {
         nestedIntervalMsec = 0;
     }
 };
+
+#endif // ALGO_PARAMS_HPP

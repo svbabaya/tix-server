@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYSTEM_CONSTANTS_HPP
+#define SYSTEM_CONSTANTS_HPP
 
 namespace SysConst {
     static constexpr long BYTES_IN_MB = 1024 * 1024;
@@ -6,6 +7,7 @@ namespace SysConst {
     static constexpr int DEFAULT_SERVER_PORT = 8080;
 }
 
+#endif // SYSTEM_CONSTANTS_HPP
 
 /**** 
 //// From legacy _common.h
