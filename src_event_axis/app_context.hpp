@@ -2,7 +2,7 @@
 
 #include "camera_info.hpp"
 #include "command_processor.hpp"
-#include "algo_params.hpp" // Вынесли структуры параметров сюда
+#include "algo_params.hpp"
 
 #include <pthread.h>
 #include <vector>
