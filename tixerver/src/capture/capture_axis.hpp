@@ -17,8 +17,12 @@ public:
     }
 
     bool open(const CaptureParams& cfg) override;
+    
+    
     void close() override;
     Frame handle() override;
+
+    
 };
 
 #endif // CAPTURE_AXIS_HPP

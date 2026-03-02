@@ -57,8 +57,8 @@ TARGET = tixerver
 # CSRC = $(CJSON_DIR)/cJSON.c
 
 OBJECTS = main.o camera_info.o network_server.o math_engine.o \
-			command_processor.o capture_axis.o rowMatClass.o \
-			traffcounter.o parser_config.o cJSON.o
+			command_processor.o capture_axis.o capture_stub.o rowMatClass.o \
+			traffcounter.o parser_config.o capture_factory.o cJSON.o
 
 all: debug
 

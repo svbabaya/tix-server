@@ -4,10 +4,11 @@
 #include <string>
 
 struct CaptureParams {
+    std::string camera_type = "axis"; // "axis", "stub"
     int width = 640;
     int height = 480;
     int fps = 10;
-    std::string format = "Y800"; // Других форматов не предусмотрено
+    std::string format = "Y800"; // Других форматов пока не предусмотрено
 };
 
 #endif // CAPTURE_PARAMS_HPP

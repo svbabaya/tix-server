@@ -1,12 +1,6 @@
 #include "math_engine.hpp"
 #include "traffcounter.hpp"
-
-
-
-#include "capture_axis.hpp"
-
-
-
+#include "capture_factory.hpp" 
 #include "algo_params.hpp"
 
 #include <unistd.h>
@@ -24,9 +18,11 @@ void MathEngine::processing_loop(AppContext* ctx) {
 
     TraffCounter traffCounter;
 
-    CaptureAxis capturer;
+    // Тип берем из параметров (нужно добавить поле camera_type в CaptureParams)
+    auto capturer = CaptureFactory::create(ctx->capParams.camera_type);
 
-    if (!capturer.open(ctx->capParams)) {
+    // Проверка указателя и вызов через ->
+    if (!capturer || !capturer->open(ctx->capParams)) {
         syslog(LOG_ERR, "MathEngine: Capture open failed!");
         return;
     }
@@ -34,7 +30,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
     syslog(LOG_NOTICE, "MathEngine: Processing started (Multi-Sensor Mode)");
 
     while (ctx->running.load()) {
-        Frame frame = capturer.handle();
+        Frame frame = capturer->handle();
         
         if (!frame.empty()) {
             // ШАГ 1: Забираем актуальный снимок настроек (Snapshot)
@@ -58,5 +54,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
 
     // СЮДА поток попадет ТОЛЬКО после получения сигнала
     syslog(LOG_NOTICE, "MathEngine: Thread exiting gracefully.");
-    capturer.close(); // Явное закрытие ресурсов видео
+
+    // Обращение через -> (хотя unique_ptr сам закроет при выходе из функции)
+    capturer->close(); // Явное закрытие ресурсов видео
 }
