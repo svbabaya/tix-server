@@ -43,8 +43,9 @@ int main() {
     signal(SIGTERM, signal_handler);
 
     // 4. Запуск сетевых служб
-    if (!NetworkServer::start(&app, 8085, 8095)) {
-        syslog(LOG_CRIT, "Failed to start NetworkServer!");
+    if (!NetworkServer::start(&app, app.netParams.data_port, app.netParams.api_port)) {
+        syslog(LOG_CRIT, "Failed to start NetworkServer on ports %d, %d!", 
+               app.netParams.data_port, app.netParams.api_port);
         event_base_free(base);
         return 1;
     }
@@ -57,7 +58,8 @@ int main() {
         return 1;
     }
 
-    syslog(LOG_INFO, "TiXerver running. HTTP: 8085, TCP: 8095");
+    syslog(LOG_INFO, "TiXerver running. Data Port: %d, API Port: %d", 
+           app.netParams.data_port, app.netParams.api_port);
 
     // 6. Вход в сетевой цикл (БЛОКИРУЮЩИЙ ВЫЗОВ)
     // Основной поток "живет" здесь, пока не придет сигнал

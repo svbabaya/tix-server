@@ -26,8 +26,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
 
     CaptureAxis capturer;
 
-    // Используем константы разрешения из камеры Axis
-    if (!capturer.open(ctx->capConfig)) {
+    if (!capturer.open(ctx->capParams)) {
         syslog(LOG_ERR, "MathEngine: Capture open failed!");
         return;
     }

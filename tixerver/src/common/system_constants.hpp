@@ -4,7 +4,7 @@
 namespace SysConst {
     static constexpr long BYTES_IN_MB = 1024 * 1024;
     static constexpr int MAX_STATISTICS_FILE_SIZE_MB = 5;
-    static constexpr int DEFAULT_SERVER_PORT = 8080;
+    
 }
 
 #endif // SYSTEM_CONSTANTS_HPP
@@ -25,4 +25,5 @@ namespace SysConst {
 //tcpclient
 #define COMMAND_DELAY_MS	100
 #define CHAR_BUFFER_SIZE	8192
+
 ****/

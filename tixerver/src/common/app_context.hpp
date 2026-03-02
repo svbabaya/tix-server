@@ -2,9 +2,10 @@
 #define APP_CONTEXT_HPP
 
 #include "camera_info.hpp"
-#include "capture_config.hpp"
+#include "capture_params.hpp"
 #include "command_processor.hpp"
 #include "algo_params.hpp"
+#include "network_params.hpp"
 
 #include <pthread.h>
 #include <vector>
@@ -72,9 +73,8 @@ struct AppContext {
     struct event_base* base;    // Для libevent
     AlgoSettings algoSettings;  // Настройки алгоритма
     MathResults results;        // Текущая статистика
-
-    CaptureConfig capConfig;    // Параметры захвата
-
+    CaptureParams capParams;    // Параметры захвата
+    NetworkParams netParams;    // Параметры доступа к серверам приложения
     CameraInfo info;            // Данные о камере Axis
     CommandProcessor processor; // Обработчик команд
 

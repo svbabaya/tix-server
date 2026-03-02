@@ -14,7 +14,7 @@ void CaptureAxis::close() {
     h = 0;
 }
 
-bool CaptureAxis::open(const CaptureConfig& cfg) {
+bool CaptureAxis::open(const CaptureParams& cfg) {
     close();
     w = cfg.width; 
     h = cfg.height;

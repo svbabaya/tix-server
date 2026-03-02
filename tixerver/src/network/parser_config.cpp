@@ -1,4 +1,4 @@
-#include "algo_params.hpp"
+#include "parser_config.hpp"
 
 #include <cJSON.h>
 #include <syslog.h>

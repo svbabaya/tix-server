@@ -16,7 +16,7 @@ public:
         close();
     }
 
-    bool open(const CaptureConfig& cfg) override;
+    bool open(const CaptureParams& cfg) override;
     void close() override;
     Frame handle() override;
 };

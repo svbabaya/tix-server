@@ -1,5 +1,5 @@
 #include "network_server.hpp"
-#include "config_parser.hpp"
+#include "parser_config.hpp"
 
 extern "C" {
     #include "cJSON.h"
