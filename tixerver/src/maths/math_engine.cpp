@@ -18,15 +18,15 @@ void MathEngine::processing_loop(AppContext* ctx) {
 
     TraffCounter traffCounter;
 
-    // Тип берем из параметров (нужно добавить поле camera_type в CaptureParams)
-    auto capturer = CaptureFactory::create(ctx->capParams.camera_type);
+    auto capturer = CaptureFactory::create();
 
-    // Проверка указателя и вызов через ->
+    // Сработает, если фабрика вернула nullptr
+    // Проверка на nullptr обязательна, если камера не определена в сборке
     if (!capturer || !capturer->open(ctx->capParams)) {
-        syslog(LOG_ERR, "MathEngine: Capture open failed!");
+        syslog(LOG_ERR, "MathEngine: Capture initialization failed (No implementation or open error)!");
         return;
     }
-
+    
     syslog(LOG_NOTICE, "MathEngine: Processing started (Multi-Sensor Mode)");
 
     while (ctx->running.load()) {

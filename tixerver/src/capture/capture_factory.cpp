@@ -1,21 +1,26 @@
 #include "capture_factory.hpp"
-#include "capture_axis.hpp"
-#include "capture_stub.hpp"
 
-std::unique_ptr<CaptureBase> CaptureFactory::create(const std::string& type) {
-    // В C++11 используем конструктор std::unique_ptr(new T)
+#if defined(CAMERA_AXIS)
+    #include "capture_axis.hpp"
+#elif defined(CAMERA_STUB)
+    #include "capture_stub.hpp"
+#elif defined(CAMERA_HIK)
+    // #include "capture_hik.hpp"
+#endif
 
-    if (type == "axis") {
-        return std::unique_ptr<CaptureBase>(new CaptureAxis());
-    } 
-    
-    if (type == "stub") {
-        return std::unique_ptr<CaptureBase>(new CaptureStub());
-    }
+std::unique_ptr<CaptureBase> CaptureFactory::create() {
+#if defined(CAMERA_AXIS)
+    return std::unique_ptr<CaptureBase>(new CaptureAxis());
 
-    // Add new type: if (type == "hikvision")...
-
-    // По умолчанию или при ошибке возвращаем заглушку, 
-    // чтобы MathEngine не упал от нулевого указателя
+#elif defined(CAMERA_STUB)
     return std::unique_ptr<CaptureBase>(new CaptureStub());
+
+// #elif defined(CAMERA_HIK)
+    // return std::unique_ptr<CaptureBase>(new CaptureHik());
+
+#else
+    // Если при компиляции не задан ни один тип камеры (-D...)
+    // Возвращаем nullptr, чтобы MathEngine мог корректно обработать ошибку
+    return nullptr;
+#endif
 }
