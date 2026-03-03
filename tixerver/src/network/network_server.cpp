@@ -15,13 +15,16 @@ extern "C" {
 #include <stdlib.h>
 #include <cstring>
 
+
 // --- HTTP Обработчики ---
 
 // GET /api/info -> CameraInfo
 void http_get_info_cb(struct evhttp_request* req, void* arg) {
+
     AppContext* ctx = (AppContext*)arg;
 
     ctx->info = InfoCollector::collect();
+
 
     // pthread_mutex_lock(&ctx->info.lock); 
     std::string json = ctx->info.toJson();
@@ -96,7 +99,10 @@ bool NetworkServer::start(AppContext* ctx, int http_port, int tcp_port) {
     struct evhttp* http = evhttp_new(ctx->base);
     evhttp_set_cb(http, "/api/info", http_get_info_cb, ctx);
     evhttp_set_cb(http, "/api/settings", http_post_settings_cb, ctx);
-    if (evhttp_bind_socket(http, "0.0.0.0", (uint16_t)http_port) != 0) return false;
+    if (evhttp_bind_socket(http, "0.0.0.0", (uint16_t)http_port) != 0) {
+        return false;
+    }
+
 
     // Настройка TCP
     struct sockaddr_in sin;

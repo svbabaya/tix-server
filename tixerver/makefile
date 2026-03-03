@@ -24,12 +24,13 @@ VPATH = $(SUBDIRS)
 INC_FLAGS = $(addprefix -I, $(SUBDIRS))
 
 # 3. Данные приложения
-APP_NAME := $(shell grep "MENUNAME" package.conf | cut -d'=' -f2 | tr -d '"')
+APP_NAME := $(shell grep "APPNAME" package.conf | cut -d'=' -f2 | tr -d '"')
 MAJOR := $(shell grep "APPMAJORVERSION" package.conf | cut -d'=' -f2 | tr -d '"')
 MINOR := $(shell grep "APPMINORVERSION" package.conf | cut -d'=' -f2 | tr -d '"')
 MICRO := $(shell grep "APPMICROVERSION" package.conf | cut -d'=' -f2 | tr -d '"')
 APP_VER := $(MAJOR).$(MINOR).$(MICRO)
 
+# Записать данные о названии приложения и версии в исходный код в виде макросов APP_NAME, APP_VER
 APP_DEFS = -DAPP_NAME_STR=\"$(APP_NAME)\" -DAPP_VER_STR=\"$(APP_VER)\"
 
 # Список общих объектов

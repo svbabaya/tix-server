@@ -1,12 +1,11 @@
+#include "app_context.hpp"
+#include "network_server.hpp"
+#include "math_engine.hpp"
+
 #include <pthread.h>
 #include <syslog.h>
 #include <event2/event.h>
 #include <signal.h>
-
-#include "app_context.hpp"
-#include "network_server.hpp"
-#include "math_engine.hpp"
-#include "system_constants.hpp"
 
 // Глобальный указатель для доступа из обработчика сигналов
 static AppContext* g_ctx = nullptr;
@@ -25,7 +24,7 @@ void signal_handler(int sig) {
 
 int main() {
     openlog("TiXerver", LOG_PID | LOG_CONS, LOG_USER);
-    syslog(LOG_NOTICE, "TiXerver version 1.0 starting...");
+    syslog(LOG_NOTICE, "%s version %s starting...", APP_NAME_STR, APP_VER_STR); // Данные из макросов makefile
 
     // 1. Инициализация libevent
     struct event_base* base = event_base_new();
@@ -43,9 +42,9 @@ int main() {
     signal(SIGTERM, signal_handler);
 
     // 4. Запуск сетевых служб
-    if (!NetworkServer::start(&app, app.netParams.data_port, app.netParams.api_port)) {
+    if (!NetworkServer::start(&app, app.netParams.api_port, app.netParams.data_port)) {
         syslog(LOG_CRIT, "Failed to start NetworkServer on ports %d, %d!", 
-               app.netParams.data_port, app.netParams.api_port);
+               app.netParams.api_port, app.netParams.data_port);
         event_base_free(base);
         return 1;
     }
@@ -58,8 +57,8 @@ int main() {
         return 1;
     }
 
-    syslog(LOG_INFO, "TiXerver running. Data Port: %d, API Port: %d", 
-           app.netParams.data_port, app.netParams.api_port);
+    syslog(LOG_NOTICE, "%s running. API Port: %d, Data Port: %d", 
+           APP_NAME_STR, app.netParams.api_port, app.netParams.data_port);
 
     // 6. Вход в сетевой цикл (БЛОКИРУЮЩИЙ ВЫЗОВ)
     // Основной поток "живет" здесь, пока не придет сигнал
@@ -69,7 +68,7 @@ int main() {
     syslog(LOG_NOTICE, "Waiting for MathEngine to finish...");
     pthread_join(math_thread_id, NULL); // Теперь это в правильном месте
 
-    syslog(LOG_NOTICE, "TiXerver stopped gracefully.");
+    syslog(LOG_NOTICE, "%s stopped gracefully.", APP_NAME_STR);
     event_base_free(base);
     closelog();
 
