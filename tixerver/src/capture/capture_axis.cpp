@@ -27,16 +27,22 @@ bool CaptureAxis::open(const CaptureParams& cfg) {
 
     source = capture_open_stream(IMAGE_UNCOMPRESSED, cap_prop);
     
-    if (!source) return false;
+    if (!source) {
+        return false;
+    }
     return data.create(h, w);
 }
 
 
 Frame CaptureAxis::handle() {
-    if (!source) return Frame();
+    if (!source) {
+        return Frame();
+    }
     
     media_frame *frame = capture_get_frame(source);
-    if (!frame) return Frame();
+    if (!frame) {
+         return Frame();
+    }
 
     const uchar* fData = (const uchar*)capture_frame_data(frame);
     if (fData) {

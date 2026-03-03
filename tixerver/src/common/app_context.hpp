@@ -54,11 +54,37 @@ struct AlgoSettings {
  * Результаты обработки (то, что уходит клиенту по TCP)
  */
 struct MathResults {
-    int objects_detected;
-    double last_score;
+    // int objects_detected;
+    // double last_score;
+
+    int id;
+	int period;
+	int videoOk;
+	std::string reserv;
+	std::string sensName;
+	float distanceLengthKm;
+
+    /*** Data for network protocol */
+	std::string time;
+	int counter, speed;
+	float k;
+	int occup;
+	int Cnt0, Cnt1, Cnt2, Cnt3, Cnt4;
+	int Spd0, Spd1, Spd2, Spd3, Spd4;
+	float gap;
+	int headway;
+	int negcnt;
+	int totalCounter;
+	bool carDetected, carDetected_sensor;
+	int curCounter, curSpeed, curCnt[5];
+	float curLength;
+	std::string curClass;
+	int lastAvgCounter;
+    /*** end Data for network protocol */
+
     pthread_mutex_t lock;
 
-    MathResults() : objects_detected(0), last_score(0.0) {
+    MathResults() : counter(0), speed(0) {
         pthread_mutex_init(&lock, NULL);
     }
     ~MathResults() {
@@ -84,7 +110,9 @@ struct AppContext {
     AppContext(struct event_base* b) : base(b), processor() {}
     
     // Метод для остановки
-    void stop() { running.store(false); }
+    void stop() { 
+        running.store(false); 
+    }
 };
 
 #endif // APP_CONTEXT_HPP

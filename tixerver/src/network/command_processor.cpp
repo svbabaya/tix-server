@@ -20,8 +20,8 @@ std::string CommandProcessor::execute(const std::string& cmd, AppContext* ctx) {
 
 std::string CommandProcessor::handleGE(AppContext* ctx) {
     pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
+    int count = 1; // ctx->results.objects_detected;
+    double score = 10; // ctx->results.last_score;
     pthread_mutex_unlock(&ctx->results.lock);
 
     char resp[128];
@@ -31,8 +31,8 @@ std::string CommandProcessor::handleGE(AppContext* ctx) {
 
 std::string CommandProcessor::handleGE2(AppContext* ctx) {
     pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
+    int count = 2; // ctx->results.objects_detected;
+    double score = 20; // ctx->results.last_score;
     pthread_mutex_unlock(&ctx->results.lock);
 
     char resp[128];
@@ -42,8 +42,8 @@ std::string CommandProcessor::handleGE2(AppContext* ctx) {
 
 std::string CommandProcessor::handleGS(AppContext* ctx) {
     pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
+    int count = 3; // ctx->results.objects_detected;
+    double score = 30; // ctx->results.last_score;
     pthread_mutex_unlock(&ctx->results.lock);
 
     char resp[128];
@@ -53,8 +53,8 @@ std::string CommandProcessor::handleGS(AppContext* ctx) {
 
 std::string CommandProcessor::handleGK(AppContext* ctx) {
     pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
+    int count = 4; // ctx->results.objects_detected;
+    double score = 40; // ctx->results.last_score;
     pthread_mutex_unlock(&ctx->results.lock);
 
     char resp[128];
@@ -64,8 +64,8 @@ std::string CommandProcessor::handleGK(AppContext* ctx) {
 
 std::string CommandProcessor::handleGL(AppContext* ctx) {
     pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
+    int count = 5; // ctx->results.objects_detected;
+    double score = 50; // ctx->results.last_score;
     pthread_mutex_unlock(&ctx->results.lock);
 
     char resp[128];

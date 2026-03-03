@@ -1,168 +1,95 @@
 #include "traffcounter.hpp"
-
-#include <sys/time.h>
-#include <sys/statvfs.h>
-#include <unistd.h>   
-#include <fcntl.h>
-#include <cstdio>
-#include <cstring>
 #include <syslog.h>
 
-/**
- * Конструктор: инициализация таймеров и резервирование RAM.
- */
-TraffCounter::TraffCounter() 
-    : totalObjects(0), currentScore(0.0), fileCounter(0) {
+TraffCounter::TraffCounter() {
     lastSyncTime = getCurrentMillis();
-    
-    // Резервируем память для истории (учитываем лимиты MIPS)
-    frameHistory.reserve(MAX_HISTORY_SIZE);
 }
 
 /**
- * Вспомогательный метод для времени.
+ * Преобразование новых параметров в структуру старого ПО.
  */
-long TraffCounter::getCurrentMillis() {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
-}
+// old::TraffAlgParams TraffCounter::mapToOldParams(const SensorParams& p) {
+//     old::TraffAlgParams oldP;
+//     // Маппим только то, что есть в вашем новом конфиге
+//     oldP.BINARIZATION_THRESHOLD = p.binarizationThreshold;
+//     // Остальные параметры старого ПО останутся по умолчанию (из конструктора oldP)
+//     // или добавьте их в ваш algo_params.hpp
+//     return oldP;
+// }
 
-/**
- * Синхронизация: забираем Snapshot настроек из AppContext.
- * Теперь работаем с GlobalConfig (список сенсоров).
- */
 void TraffCounter::updateSettings(const GlobalConfig& cfg) {
+    // Если конфигурация изменилась, переинициализируем старый движок
+    // if (this->internalConfig.sensors.size() != cfg.sensors.size()) {
+        
+    //     std::vector<old::TraffSensor> oldSensors;
+    //     old::TraffAvgParams avgParams; // Можно настроить интервалы усреднения тут
 
-    /*** Debug */
-    // Если количество сенсоров изменилось или это первая загрузка
-    if (this->internalConfig.sensors.size() != cfg.sensors.size()) {
-        syslog(LOG_NOTICE, "[TraffCounter] Local config updated: %lu -> %lu sensors", 
-               (unsigned long)this->internalConfig.sensors.size(), 
-               (unsigned long)cfg.sensors.size());
-    }
-    /*** end Debug */
+    //     for (const auto& s : cfg.sensors) {
+    //         old::TraffSensor sensor;
+    //         // s.id -> sensor.setId(...)
+    //         // s.zone -> передаем координаты в сенсор
+    //         sensor.setParams(mapToOldParams(s.params));
+    //         oldSensors.push_back(sensor);
+    //     }
 
+    //     // Инициализируем старый движок списком подготовленных сенсоров
+    //     oldEngine.initTraffSensors(oldSensors, avgParams, true, 1);
+        
+    //     syslog(LOG_NOTICE, "[TraffCounter] Old engine re-initialized with %zu sensors", oldSensors.size());
+    // }
     this->internalConfig = cfg;
 }
 
-/**
- * Основная обработка: итерируемся по всем активным сенсорам.
- */
+
+
+
+
+// Переделываем
 void TraffCounter::processFrame(const Frame& frame) {
-
-    /*** Debug */
-    static bool firstRunAfterConfig = false;
-    if (internalConfig.sensors.empty()) {
-        firstRunAfterConfig = true;
-        return;
-    }
-    if (firstRunAfterConfig) {
-        syslog(LOG_INFO, "[TraffCounter] Processing FIRST frame with sensor ID: %d (Thr: %d)", 
-               internalConfig.sensors[0].id, internalConfig.sensors[0].params.binarizationThreshold);
-        firstRunAfterConfig = false;
-    }
-    /*** end Debug */
-
-    // 1. Если кадра нет или сервер еще не прислал сенсоры — выходим
     if (frame.empty() || internalConfig.sensors.empty()) {
         return;
     }
 
-    // 2. Проходим по каждому сенсору в списке
-    for (const auto& sensor : internalConfig.sensors) {
-        
-        // ВАЖНО: Здесь будет ваша математика по зоне (sensor.zone)
-        // Для примера — берем только первую точку четырехугольника
-        int x = sensor.zone.p1.x;
-        int y = sensor.zone.p1.y;
+    // ВЫЗОВ СТАРОГО АЛГОРИТМА
+    // Метод processImage внутри итерируется по sensorList и делает всю математику
+    //bool isAveragingDone = oldEngine.processImage(frame);
 
-        // Безопасная проверка границ кадра
-        // Если значения могут быть отрицательными (защита от мусора):
-        if (x < 0 || x >= (int)frame.width() || y < 0 || y >= (int)frame.height()) {
-            continue;
-        }
-
-        uchar pixelVal = frame[y][x];
-
-        // Используем параметры конкретно этого сенсора
-        if (pixelVal > sensor.params.binarizationThreshold) {
-            totalObjects++;
-            currentScore = (double)pixelVal / 255.0;
-
-            // Наполнение истории для отладки
-            if (frameHistory.size() < MAX_HISTORY_SIZE) {
-                frameHistory.push_back(pixelVal);
-            }
-        }
-    }
-
-    // 3. Триггер сохранения истории (общий на все сенсоры)
-    if (totalObjects > 0 && (totalObjects % 500 == 0)) {
-        saveHistoryToCSV();
-    }
 }
 
-/**
- * Редкая синхронизация (раз в 10 секунд) с результатами в AppContext.
- */
+
+
+
+
+// Переделываем - достаем результаты из старого TraffCounter
 void TraffCounter::syncResultsIfNeeded(MathResults& globalResults) {
-    long now = getCurrentMillis();
+    // long now = getCurrentMillis();
     
-    if (now - lastSyncTime >= 10000) { // Используем 10000мс напрямую
-        pthread_mutex_lock(&globalResults.lock);
-        globalResults.objects_detected = totalObjects;
-        globalResults.last_score = currentScore;
-        pthread_mutex_unlock(&globalResults.lock);
+    // if (now - lastSyncTime >= syncIntervalMs) {
+    //     std::vector<old::TraffStat> stats;
+    //     oldEngine.toTraffStat(stats, true);
 
-        syslog(LOG_INFO, "[TraffCounter] Sync: Total=%d, ActiveSensors=%lu", 
-               totalObjects, (unsigned long)internalConfig.sensors.size());
+         pthread_mutex_lock(&globalResults.lock);
+        
+    //     // Агрегируем данные из всех сенсоров старого ПО в ваши глобальные результаты
+    //     int total = 0;
+    //     for (const auto& s : stats) {
+    //         total += s.totalCounter;
+    //     }
+    //     globalResults.objects_detected = total;
+        
+         pthread_mutex_unlock(&globalResults.lock);
 
-        lastSyncTime = now;
-    }
+    //     lastSyncTime = now;
+    // }
 }
 
-/**
- * Сохранение в CSV с ротацией файлов и проверкой места.
- */
-void TraffCounter::saveHistoryToCSV() {
-    if (frameHistory.empty()) return;
 
-    const char* targetPath = "/tmp";
-    const int MAX_FILES = 5;
 
-    // 1. Ротация (удаление старых)
-    if (fileCounter >= MAX_FILES) {
-        char oldFileName[64];
-        snprintf(oldFileName, sizeof(oldFileName), "%s/traff_report_%d.csv", 
-                 targetPath, fileCounter - MAX_FILES);
-        unlink(oldFileName);
-    }
 
-    // 2. Проверка места на диске
-    struct statvfs vfs;
-    if (statvfs(targetPath, &vfs) == 0) {
-        unsigned long long freeSpace = (unsigned long long)vfs.f_bsize * vfs.f_bavail;
-        if (freeSpace < 256 * 1024) return;
-    }
 
-    // 3. Запись файла через POSIX (экономим RAM)
-    char fileName[64];
-    snprintf(fileName, sizeof(fileName), "%s/traff_report_%d.csv", targetPath, fileCounter++);
-    
-    int fd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (fd >= 0) {
-        const char* header = "ID,Value\n";
-        write(fd, header, strlen(header));
-
-        char lineBuf[32];
-        for (size_t i = 0; i < frameHistory.size(); ++i) {
-            int len = snprintf(lineBuf, sizeof(lineBuf), "%lu,%d\n", 
-                               (unsigned long)i, (int)frameHistory[i]);
-            write(fd, lineBuf, len);
-        }
-        close(fd);
-    }
-
-    frameHistory.clear();
+// Оставляем как есть, на старый алгоритм не влияет
+long TraffCounter::getCurrentMillis() {
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }

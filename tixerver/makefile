@@ -19,7 +19,7 @@ CJSON_DIR = $(CURDIR)/libs/cjson
 OPENCV_DIR = /mnt/c/viat/libs/opencv341/build.mipsisa32r2el/install
 
 # Поддиректории для VPATH и Includes
-SUBDIRS = . src/common src/capture src/network src/maths
+SUBDIRS = . src/common src/capture src/network src/maths src/maths/legacy
 VPATH = $(SUBDIRS)
 INC_FLAGS = $(addprefix -I, $(SUBDIRS))
 
@@ -37,6 +37,7 @@ APP_DEFS = -DAPP_NAME_STR=\"$(APP_NAME)\" -DAPP_VER_STR=\"$(APP_VER)\"
 COMMON_OBJECTS = main.o camera_info.o network_server.o math_engine.o \
                  command_processor.o rowMatClass.o traffcounter.o \
                  parser_config.o capture_factory.o cJSON.o
+                 # old_traffcounter.o old_datastructs.o old_traffsensor.o old_traffzone.o old_utils_cam.o old_utils_traff.o
 
 # Логика выбора реализации камеры
 ifeq ($(CAMERA_TYPE), AXIS)
@@ -62,6 +63,8 @@ COMMON_FLAGS = $(APP_DEFS) $(INC_FLAGS) -Wall -Wextra -Werror -pedantic \
 CXXFLAGS := $(filter-out -std=c89 -std=c90 -ansi, $(CXXFLAGS))
 CXXFLAGS += $(COMMON_FLAGS) -std=c++11 -msoft-float -march=mips32r2 -EL
 CFLAGS   += $(COMMON_FLAGS) -std=c89 -msoft-float -march=mips32r2 -EL
+
+CXXFLAGS += -Isrc/maths/legacy
 
 # 5. ЛИНКОВКА
 # Чтобы libevent нашелся, его путь должен быть первым в LDFLAGS
