@@ -1,5 +1,5 @@
 #ifndef OLD_DATASTRUCTS_H
-#define OLD_DATASTRUCTS_H_
+#define OLD_DATASTRUCTS_H
 
 namespace old {
 

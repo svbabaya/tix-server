@@ -3,14 +3,13 @@
 
 #include <vector>
 #include <cstdint>
-
+#include <cmath>
 #include <sys/time.h>
 #include <opencv2/core/core.hpp>
 
 typedef uint8_t uchar;
 typedef double _FloatType;
 
-// 1. Геометрия и Координаты
 struct PointYX {
     int y, x;
     PointYX();
@@ -38,7 +37,6 @@ private:
     void computeBoundingRect();
 };
 
-// 2. Базовая матрица (Y800 8-бит)
 class RowMat {
 protected:
     size_t *refcounter;
@@ -46,7 +44,6 @@ protected:
     uchar *data;
     uchar **rows;
     size_t hh, ww;
-
     void cleanup();
 
 public:
@@ -63,33 +60,40 @@ public:
     cv::Mat toCvView() const;
     RowMat clone() const;
     void release();
-
     void getMeanStdDev(_FloatType &mean, _FloatType &stdDev) const;
 
-    // Inline-методы для максимальной производительности на MIPS
     inline bool empty() const { return refcounter == nullptr; }
     inline size_t height() const { return hh; }
     inline size_t width() const { return ww; }
     inline uchar* operator[](size_t y) { return rows[y]; }
     inline const uchar* operator[](size_t y) const { return rows[y]; }
     inline uchar* ptr() { return data; }
+    inline const uchar* ptr() const { return data; }
 };
 
-// 3. Видеокадр
 class Frame : public RowMat {
 public:
+    struct FramePt {
+        const uchar* p;
+        inline void operator++() { ++p; }
+        inline const uchar* operator[](size_t) const { return p; }
+    };
+
     struct timeval t;
-    
+    bool rgb, yuv; // не используются только для совместимости со старой версией
+
     Frame();
-
-    Frame(const Frame& other) = default; 
+    Frame(const Frame& other) = default;
     Frame& operator=(const Frame& other) = default;
-
     Frame(Frame&& other) noexcept;
     Frame& operator=(Frame&& other) noexcept;
-    Frame clone() const;
 
-    inline size_t size() const { return empty() ? 0 : 1; }
+    Frame clone() const;
+    void getRowPts(FramePt &st, size_t row, size_t col = 0) const;
+    
+    // Оптимизированный доступ для одномерного цикла
+    inline const uchar* begin() const { return ptr(); }
+    inline const uchar* end() const { return ptr() + (hh * ww); }
 };
- 
-#endif // ROWMATCLASS_HPP
+
+#endif
