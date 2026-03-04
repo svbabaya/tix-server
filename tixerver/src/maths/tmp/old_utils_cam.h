@@ -1,8 +1,6 @@
 #ifndef OLD_UTILS_CAM_H
 #define OLD_UTILS_CAM_H
 
-namespace old {
-
 #include "old_common.h"
 #include "old_datastructs.h"
 #include "old_utils_traff.h"
@@ -15,6 +13,8 @@ namespace old {
 #include <climits>
 #include <math.h>
 #include <algorithm>
+
+namespace old {
 
 // Copy data
 inline void copyZoneImageFromFullFrame(RowMat<uchar> &dst, const TraffRect &rR, const RowMat<uchar> &src) {

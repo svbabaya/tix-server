@@ -1,8 +1,6 @@
 #ifndef OLD_ROWMATCLASS_H
 #define OLD_ROWMATCLASS_H
 
-namespace old {
-
 #include "old_common.h"
 
 #include <opencv2/core/core.hpp>
@@ -11,6 +9,8 @@ namespace old {
 #include <cstring>
 #include <math.h>
 #include <vector>
+
+namespace old {
 
 struct PointYX {
 	int y, x;

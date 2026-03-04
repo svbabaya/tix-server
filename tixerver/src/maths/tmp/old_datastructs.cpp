@@ -1,10 +1,10 @@
-namespace old {
-
 #include "old_datastructs.h"
 #include "old_utils_cam.h"
 
 #include <fstream>
 
+namespace old {
+	
 using std::string;
 
 //Camera params

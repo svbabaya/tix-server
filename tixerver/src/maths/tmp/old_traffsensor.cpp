@@ -1,5 +1,3 @@
-namespace old {
-
 #include "old_traffsensor.h"
 
 #include <fstream>
@@ -9,6 +7,8 @@ namespace old {
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/time.h>
+
+namespace old {
 
 const float ONE_MILLIONTH = 1.0f / 1e6f;
 

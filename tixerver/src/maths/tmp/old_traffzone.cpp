@@ -1,10 +1,10 @@
-namespace old {
-
 #include "old_traffsensor.h"
 #include "old_utils_cam.h"
 
 #include <iomanip>
 #include <sys/time.h>
+
+namespace old {
 
 TraffSensor::TraffZone::TraffZone() {
 	clear();

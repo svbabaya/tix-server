@@ -1,8 +1,6 @@
 #ifndef OLD_COMMON_H
 #define OLD_COMMON_H
 
-namespace old {
-
 #include <stdio.h>
 #include <syslog.h>
 
@@ -29,7 +27,5 @@ namespace old {
 
 #define LOGINFO(fmt, ...) { syslog(LOG_INFO, fmt, ##__VA_ARGS__); printf(fmt, ##__VA_ARGS__); }
 #define LOGERR(fmt, ...) { syslog(LOG_CRIT, fmt, ##__VA_ARGS__); fprintf(stderr, fmt, ##__VA_ARGS__); }
-
-}
 
 #endif // OLD_COMMON_H

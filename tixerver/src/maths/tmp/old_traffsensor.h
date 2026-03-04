@@ -1,10 +1,7 @@
 #ifndef OLD_TRAFFSENSOR_H
 #define OLD_TRAFFSENSOR_H
 
-namespace old {
-
 #include "old_common.h"
-
 #include "rowMatClass.hpp" // новая версия, включающая объявления, которые в старой версии находились в datastructs.h
 #include "old_utils_traff.h"
 
@@ -17,6 +14,8 @@ namespace old {
 #include <vector>
 #include <pthread.h>
 #include <sys/time.h>
+
+namespace old {
 
 class TraffSensor : private TraffStat {
 	struct AveragingValues {

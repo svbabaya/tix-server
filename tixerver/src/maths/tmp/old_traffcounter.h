@@ -1,13 +1,14 @@
 #ifndef OLD_TRAFFCOUNTER_H
 #define OLD_TRAFFCOUNTER_H
 
-namespace old {
-
 #include "old_common.h"
 #include "old_traffsensor.h"
+#include "old_utils_traff.h"
 
 #include <vector>
 #include <sys/time.h>
+
+namespace old {
 
 class TraffCounter {
 public:

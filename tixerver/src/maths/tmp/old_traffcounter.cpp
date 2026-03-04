@@ -1,6 +1,6 @@
-namespace old {
-
 #include "old_traffcounter.h"
+
+namespace old {
 
 std::string getCurrentDateTime() {
 	time_t t;

@@ -5,6 +5,32 @@ TraffCounter::TraffCounter() {
     lastSyncTime = getCurrentMillis();
 }
 
+// Переносим настройки алгоритма GlobalConfig cfg в internalConfig
+// ToDo Из internalConfig сделать TraffSensor, TraffAvgParams для oldEngine
+void TraffCounter::updateSettings(const GlobalConfig& cfg) {
+    /*** Debug */
+    // Если количество сенсоров изменилось или это первая загрузка
+    if (this->internalConfig.sensors.size() != cfg.sensors.size()) {
+        syslog(LOG_NOTICE, "[TraffCounter] Local config updated: %lu -> %lu sensors", 
+               (unsigned long)this->internalConfig.sensors.size(), 
+               (unsigned long)cfg.sensors.size());
+    }
+    /*** end Debug */
+    this->internalConfig = cfg;
+
+    /**** ToDo sth as traffiXInit(TraffCounter &traffixCounter) in old main.cpp */
+
+    // Определяем поля TraffAvgParams объекта oldEngine из internalConfig
+    oldEngine.avg.bigAvgInterval = internalConfig.mainIntervalMsec;
+    oldEngine.avg.smallAvgInterval = internalConfig.nestedIntervalMsec;
+
+    // Создать TraffSensor объекта oldEngine
+
+    // oldEngine.initTraffSensors
+
+    // Перенести данные из internalConfig в TraffSensor 
+}
+
 /**
  * Преобразование новых параметров в структуру старого ПО.
  */
@@ -16,33 +42,6 @@ TraffCounter::TraffCounter() {
 //     // или добавьте их в ваш algo_params.hpp
 //     return oldP;
 // }
-
-void TraffCounter::updateSettings(const GlobalConfig& cfg) {
-    // Если конфигурация изменилась, переинициализируем старый движок
-    // if (this->internalConfig.sensors.size() != cfg.sensors.size()) {
-        
-    //     std::vector<old::TraffSensor> oldSensors;
-    //     old::TraffAvgParams avgParams; // Можно настроить интервалы усреднения тут
-
-    //     for (const auto& s : cfg.sensors) {
-    //         old::TraffSensor sensor;
-    //         // s.id -> sensor.setId(...)
-    //         // s.zone -> передаем координаты в сенсор
-    //         sensor.setParams(mapToOldParams(s.params));
-    //         oldSensors.push_back(sensor);
-    //     }
-
-    //     // Инициализируем старый движок списком подготовленных сенсоров
-    //     oldEngine.initTraffSensors(oldSensors, avgParams, true, 1);
-        
-    //     syslog(LOG_NOTICE, "[TraffCounter] Old engine re-initialized with %zu sensors", oldSensors.size());
-    // }
-    this->internalConfig = cfg;
-}
-
-
-
-
 
 // Переделываем
 void TraffCounter::processFrame(const Frame& frame) {

@@ -1,13 +1,13 @@
 #ifndef OLD_DATASTRUCTS_H
 #define OLD_DATASTRUCTS_H
 
-namespace old {
-
 #include "rowMatClass.hpp"
 
 #include <vector>
 #include <string>
 #include <sys/time.h>
+
+namespace old {
 
 // Camera params
 struct CamParams {

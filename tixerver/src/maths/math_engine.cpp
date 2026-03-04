@@ -38,6 +38,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
             GlobalConfig currentCfg = ctx->algoSettings.getSnapshot();
             
             // ШАГ 2: Передаем весь конфиг (со списком сенсоров) в TraffCounter
+            // ToDo Преобразуем данные internalConfig
             traffCounter.updateSettings(currentCfg);
 
             // ШАГ 3: Обработка кадра (теперь итерируется по всем сенсорам внутри)

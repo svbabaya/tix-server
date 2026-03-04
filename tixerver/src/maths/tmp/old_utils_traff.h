@@ -1,11 +1,11 @@
 #ifndef OLD_UTILS_TRAFF_H
 #define OLD_UTILS_TRAFF_H
 
-namespace old {
-
 #include "old_common.h"
 
 #include <string>
+
+namespace old {
 
 // Statistics
 struct TraffStat {

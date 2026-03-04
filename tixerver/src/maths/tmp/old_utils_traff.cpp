@@ -1,9 +1,9 @@
-namespace old {
-
 #include "old_utils_traff.h"
 #include "old_utils_cam.h"
 
 #include <fstream>
+
+namespace old {
 
 // Statistics
 TraffStat::TraffStat() {
