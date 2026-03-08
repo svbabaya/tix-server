@@ -1,5 +1,24 @@
 # How to fix error with old version tar settings in AXIS script eap-create.sh:
 
+Error: 
+Creating Package: 'TraffiXtreamS_3_0-2_mipsisa32r2el.eap'... tar: The following options were used after non-option arguments.  These options are positional and affect only arguments that follow them.  Please, rearrange them properly.
+tar: --exclude '*~' has no effect
+tar: --exclude 'CVS' has no effect
+tar: Exiting with failure status due to previous errors
+failed
+
+Error: Could not create TraffiXtreamS_3_0-2_mipsisa32r2el.eap (FAILED)
+Reading local package.conf... ok
+Validating Package config...
+Saving Package config: 'package.conf'...ok
+Creating Package: 'TraffiXtreamS_3_0-2_mipsisa32r2el.eap'... tar: The following options were used after non-option arguments.  These options are positional and affect only arguments that follow them.  Please, rearrange them properly.
+tar: --exclude '*~' has no effect
+tar: --exclude 'CVS' has no effect
+tar: Exiting with failure status due to previous errors
+failed
+
+Solution: Find and open script 'eap-create.sh' and fix the string with tar settings:
+
 tar czf $tarb --exclude="*~" --exclude="CVS" --format=gnu $APPNAME $ADPPACKCFG $ADPPACKPARAMCFG \
                 $POSTINSTALLSCRIPT $OTHERFILES $HTTPD_CONF_LOCAL_FILES \
                 $HTTPD_MIME_LOCAL_FILES $HTMLDIR $EVENT_DECLS_DIR $LIBDIR \
