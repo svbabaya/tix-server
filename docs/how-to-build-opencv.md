@@ -6,6 +6,7 @@
 Камеры mips не имеют аппаратной поддержки вычислений с плавающей точкой, поэтому при компиляции нужно включать режим *soft-float*
 
 3. В mips.toolchain.cmake необходимо учитывать какие библиотеки нужны (статические/динамические) наличие VFP/FPU в существующей архитектуре и прочие особенности архитектуры:
+
 '''
     set(CMAKE_SYSTEM_NAME Linux)
     set(CMAKE_SYSTEM_PROCESSOR mips)
@@ -41,30 +42,33 @@
 4. В корневой папке opencv создать папку **/build** 
 
 5. Зайти в build из терминала Linux и создать конфигурацию для сборки:
+
 '''
-cmake -D CMAKE_TOOLCHAIN_FILE=../mips.toolchain.cmake \
-      -D CMAKE_BUILD_TYPE=Release \
-      -D CMAKE_INSTALL_PREFIX=./install \
-      -D BUILD_SHARED_LIBS=OFF \
-      -D BUILD_WITH_STATIC_CRT=ON \
-      -D BUILD_opencv_apps=OFF \
-      -D BUILD_EXAMPLES=OFF \
-      -D BUILD_PACKAGE=OFF \
-      -D BUILD_TESTS=OFF \
-      -D BUILD_PERF_TESTS=OFF \
-      -D CPU_BASELINE="" \
-      -D CPU_DISPATCH="" \
-      -D WITH_ITT=OFF \
-      -D WITH_TIFF=OFF \
-      -D WITH_OPENCL=OFF \
-      -D WITH_CUDA=OFF \
-      ..
+    cmake -D CMAKE_TOOLCHAIN_FILE=../mips.toolchain.cmake \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D CMAKE_INSTALL_PREFIX=./install \
+        -D BUILD_SHARED_LIBS=OFF \
+        -D BUILD_WITH_STATIC_CRT=ON \
+        -D BUILD_opencv_apps=OFF \
+        -D BUILD_EXAMPLES=OFF \
+        -D BUILD_PACKAGE=OFF \
+        -D BUILD_TESTS=OFF \
+        -D BUILD_PERF_TESTS=OFF \
+        -D CPU_BASELINE="" \
+        -D CPU_DISPATCH="" \
+        -D WITH_ITT=OFF \
+        -D WITH_TIFF=OFF \
+        -D WITH_OPENCL=OFF \
+        -D WITH_CUDA=OFF \
+        ..
 '''
 
 6. Запустить сборку:
+
     '$ make -j$(nproc)' /# Разрешить компиляцию в несколько потоков (nproc - количество ядер)
     
-7. Сформировать структуру библиотеки
+7. Сформировать структуру библиотеки:
+
     '$ make install'
     
 Будет создана структура файлов и папок библиотеки среди которых в папке **install** находятся **include/** и **lib/**, пути к которым нужно прописать при подключении к приложению.
