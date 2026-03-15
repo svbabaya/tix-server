@@ -7,8 +7,7 @@
 
 3. В mips.toolchain.cmake необходимо учитывать какие библиотеки нужны (статические/динамические) наличие VFP/FPU в существующей архитектуре и прочие особенности архитектуры:
 
-```
-    set(CMAKE_SYSTEM_NAME Linux)
+    `set(CMAKE_SYSTEM_NAME Linux)
     set(CMAKE_SYSTEM_PROCESSOR mips)
 
     # 1. Путь к бинарникам (где лежит gcc)
@@ -36,15 +35,13 @@
 
     # Важно для OpenCV: принудительно отключаем использование VFP/FPU на уровне исходников
     set(ENABLE_VFP OFF CACHE BOOL "" FORCE)
-    set(ENABLE_NEON OFF CACHE BOOL "" FORCE)
-```
+    set(ENABLE_NEON OFF CACHE BOOL "" FORCE)`
 
 4. В корневой папке opencv создать папку **/build** 
 
 5. Зайти в build из терминала Linux и создать конфигурацию для сборки:
 
-```
-    cmake -D CMAKE_TOOLCHAIN_FILE=../mips.toolchain.cmake \
+    `cmake -D CMAKE_TOOLCHAIN_FILE=../mips.toolchain.cmake \
         -D CMAKE_BUILD_TYPE=Release \
         -D CMAKE_INSTALL_PREFIX=./install \
         -D BUILD_SHARED_LIBS=OFF \
@@ -60,8 +57,7 @@
         -D WITH_TIFF=OFF \
         -D WITH_OPENCL=OFF \
         -D WITH_CUDA=OFF \
-        ..
-```
+        ..`
 
 6. Запустить сборку:
 
@@ -70,6 +66,6 @@
 7. Сформировать структуру библиотеки:
 
     `$ make install`
-    
+
 Будет создана структура файлов и папок библиотеки среди которых в папке **install** находятся **include/** и **lib/**, пути к которым нужно прописать при подключении к приложению.
     
