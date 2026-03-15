@@ -12,13 +12,13 @@
 
     `$ ./configure --host=mipsisa32r2el-axis-linux-gnu --prefix=./build --disable-shared --enable-static --disable-openssl CC=mipsisa32r2el-axis-linux-gnu-gcc`
 
-Возможна ошибка bash: ./configure: Permission denied, что значит отсутствие прав на исполнение у ./configure
+    Возможна ошибка bash: ./configure: Permission denied, что значит отсутствие прав на исполнение у ./configure
 
-Предоставляем права на исполнение:
+    Предоставляем права на исполнение:
 
     `$ chmod +x configure`
 
-Снова создаем конфигурацию
+    Снова создаем конфигурацию
 
 Возможна ошибка: configure: error: expected an absolute directory name for --prefix: ./build, что значит необходимость указать абсолютный путь для папки сборкию ./buid
 
@@ -28,11 +28,12 @@
 
     `$ make`
 
-Эта команда скомпилирует исходный код под архитектуру процессора mips
+    Эта команда скомпилирует исходный код под архитектуру процессора mips
 
 Возможна ошибка:
 
-    `CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/bash /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable/build-aux/missing aclocal-1.16 -I m4
+```
+    CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/bash /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable/build-aux/missing aclocal-1.16 -I m4
     /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable/build-aux/missing: line 81: aclocal-1.16: command not found
     WARNING: 'aclocal-1.16' is missing on your system.
          You should only need it if you modified 'acinclude.m4' or
@@ -43,14 +44,17 @@
          <https://www.gnu.org/software/autoconf>
          <https://www.gnu.org/software/m4/>
          <https://www.perl.org/>
-    make: *** [Makefile:1421: aclocal.m4] Error 127`
+    make: *** [Makefile:1421: aclocal.m4] Error 127
+```
 
     Такая ошибка может возникнуть если в директории с библиотекой уже создавали какую-то конфигурацию и запускали make.
     Чтобы исправить, выдаем права на запуск всем скриптам и configure, обновляем временные метки с помощью touch:
 
-    `$ find . -type f -name "*.sh" -exec chmod +x {} +
+```
+    $ find . -type f -name "*.sh" -exec chmod +x {} +
     $ chmod +x configure
-    $ touch configure.ac aclocal.m4 configure Makefile.am Makefile.in config.h.in`
+    $ touch configure.ac aclocal.m4 configure Makefile.am Makefile.in config.h.in
+```
 
     После этого заново делаем то, что указано в пункте 4 и запускаем make
 
@@ -58,7 +62,7 @@
 
     `$ make install`
 
-Эта команда сформирует в директории /build структуру библиотеки
+    Эта команда сформирует в директории /build структуру библиотеки
 
 Возможна ошибка:
 
