@@ -3,7 +3,7 @@
 
 - **tixerver** // приложение для камеры (c/c++11, opencv3, libevent, cjson)
 - **tixtore** // клиентское приложение (qt6)
-- **tixtune** // приложение для отладки алгоритма (python + network module + math module)
+- **tixtune** // приложение для отладки алгоритма (GUI on python + network module on Linux + math module on Linux)
 - **tixroad** // симулятор трафика (unreal engine or three.js)
 
 1. Как установить среду разработки для Axis
