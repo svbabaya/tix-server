@@ -106,7 +106,7 @@ test/regress-regress.o: test/regress.c util-internal.h \
  /usr/local/mipsisa32r2el/r23/lib/gcc/mipsisa32r2el-axis-linux-gnu/4.7.2/../../../../mipsisa32r2el-axis-linux-gnu/sys-include/sched.h \
  /usr/local/mipsisa32r2el/r23/lib/gcc/mipsisa32r2el-axis-linux-gnu/4.7.2/../../../../mipsisa32r2el-axis-linux-gnu/sys-include/bits/sched.h \
  /usr/local/mipsisa32r2el/r23/lib/gcc/mipsisa32r2el-axis-linux-gnu/4.7.2/../../../../mipsisa32r2el-axis-linux-gnu/sys-include/bits/setjmp.h \
- test/regress.gen.h include/event2/rpc.h
+ test/regress.gen.h
 
 util-internal.h:
 
@@ -359,5 +359,3 @@ test/regress_thread.h:
 /usr/local/mipsisa32r2el/r23/lib/gcc/mipsisa32r2el-axis-linux-gnu/4.7.2/../../../../mipsisa32r2el-axis-linux-gnu/sys-include/bits/setjmp.h:
 
 test/regress.gen.h:
-
-include/event2/rpc.h:

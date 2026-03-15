@@ -14,8 +14,7 @@ AXIS_USABLE_LIBS = UCLIBC GLIBC
 include $(AXIS_TOP_DIR)/tools/build/rules/common.mak
 
 # 2. Локальные пути
-# LIBEVENT_DIR = /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/build/libevent_mipsisa32r2el
-LIBEVENT_DIR = ./libs/build/libevent_mipsisa32r2el
+LIBEVENT_DIR = /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/build.mips
 CJSON_DIR = /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/cjson
 OPENCV_DIR = /home/sergebabayan.linux/opencv341/build.mipsisa32r2el/install
 
