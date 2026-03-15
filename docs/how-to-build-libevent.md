@@ -3,38 +3,27 @@
 1. Клонировать из репозитория или скачать архив **.tar.gz** нужной версии в отдельную директорию проекта, например в /libs или отдельно от проекта в домашнюю директорию /home/{username}/libs
 
 2. Разархивировать: 
-
-    '$ tar -xvzf libevent-2.1.12-stable.tar.gz'
-
+    `$ tar -xvzf libevent-2.1.12-stable.tar.gz`
 3. Зайти в директорию библиотеки
 
 4. Создать конфигурацию сборки (пример для mips): 
-
-    '$ ./configure --host=mipsisa32r2el-axis-linux-gnu --prefix=./build --disable-shared --enable-static --disable-openssl CC=mipsisa32r2el-axis-linux-gnu-gcc'
-
+    `$ ./configure --host=mipsisa32r2el-axis-linux-gnu --prefix=./build --disable-shared --enable-static --disable-openssl CC=mipsisa32r2el-axis-linux-gnu-gcc`
 Возможна ошибка bash: ./configure: Permission denied, что значит отсутствие прав на исполнение у ./configure
 
 Предоставляем права на исполнение:
-
-    '''
-    $ chmod +x configure
-    '''
-
+    `$ chmod +x configure`
 Снова создаем конфигурацию
 
 Возможна ошибка: configure: error: expected an absolute directory name for --prefix: ./build, что значит необходимость указать абсолютный путь для папки сборкию ./buid
-
-    '''
+    ```
     $ ./configure --host=mipsisa32r2el-axis-linux-gnu --prefix=/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/build --disable-shared --enable-static --disable-openssl CC=mipsisa32r2el-axis-linux-gnu-gcc
-    '''
-
+    ```
 5. Выполнить 
-
-    '$ make'
-
+    `$ make`
 Эта команда скомпилирует исходный код под архитектуру процессора mips
 
 Возможна ошибка:
+    ```
     CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/bash /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable/build-aux/missing aclocal-1.16 -I m4
     /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable/build-aux/missing: line 81: aclocal-1.16: command not found
     WARNING: 'aclocal-1.16' is missing on your system.
@@ -47,24 +36,21 @@
          <https://www.gnu.org/software/m4/>
          <https://www.perl.org/>
     make: *** [Makefile:1421: aclocal.m4] Error 127
-
+    ```
     Такая ошибка может возникнуть если в директории с библиотекой уже создавали какую-то конфигурацию и запускали make.
     Чтобы исправить, выдаем права на запуск всем скриптам и configure, обновляем временные метки с помощью touch:
-
-    '''
+    ```
     $ find . -type f -name "*.sh" -exec chmod +x {} +
     $ chmod +x configure
     $ touch configure.ac aclocal.m4 configure Makefile.am Makefile.in config.h.in
     После этого заново делаем то, что указано в пункте 4 и запускаем make
-    '''
-
+    ```
 6. Выполнить 
-
-    '$ make install'
-    
+    `$ make install`
 Эта команда сформирует в директории /build структуру библиотеки
 
 Возможна ошибка:
+    ```
     make[1]: Entering directory '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable'
     make[2]: Entering directory '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable'
     build-aux/install-sh -c -d '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/build/bin'
@@ -75,15 +61,13 @@
     make[1]: Leaving directory '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable'
     make: *** [Makefile:2801: install] Error 2
     Это означает отсутствие прав на исполнение для install-sh
-
+    ```
 Исправляем:
-
-    '''
+    ```
     $ chmod +x build-aux/install-sh
     Снова запускаем инсталяцию:
     $ make install
-    '''
-
+    ```
 Если библиотека собрана в директории build/
 Библиотеки: /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/build/lib/
 Хедеры: /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/build/include/
