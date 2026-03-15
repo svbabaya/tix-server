@@ -12,7 +12,7 @@
 
     `$ ./configure --host=mipsisa32r2el-axis-linux-gnu --prefix=./build --disable-shared --enable-static --disable-openssl CC=mipsisa32r2el-axis-linux-gnu-gcc`
 
-    Возможна ошибка bash: ./configure: Permission denied, что значит отсутствие прав на исполнение у ./configure
+    Возможна ошибка `bash: ./configure: Permission denied`, что значит отсутствие прав на исполнение у ./configure
 
     Предоставляем права на исполнение:
 
@@ -64,9 +64,9 @@
 
     Эта команда сформирует в директории /build структуру библиотеки
 
-Возможна ошибка:
-
-    `make[1]: Entering directory '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable'
+    Возможна ошибка:
+```
+    make[1]: Entering directory '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable'
     make[2]: Entering directory '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable'
     build-aux/install-sh -c -d '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/build/bin'
     /bin/bash: line 4: build-aux/install-sh: Permission denied
@@ -75,7 +75,8 @@
     make[1]: *** [Makefile:2807: install-am] Error 2
     make[1]: Leaving directory '/Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/libevent-2.1.12-stable'
     make: *** [Makefile:2801: install] Error 2
-    Это означает отсутствие прав на исполнение для install-sh`
+    Это означает отсутствие прав на исполнение для install-sh
+```
 
 Исправляем:
 
