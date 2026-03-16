@@ -26,6 +26,13 @@ int main() {
     openlog("TiXerver", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_NOTICE, "%s version %s starting...", APP_NAME_STR, APP_VER_STR); // Данные из макросов makefile
 
+    /* ToDo Проверить значение макроса SN, полученного из makefile. Если значение free,
+     * значит привязки к серийному номеру быть не должно и работа main продолжаетс, но если
+     * в SN есть серийный номер, нужно сравнить его с серийным номером камеры и при несовпадении
+     * сделать syslog и завершить работу приложения. Получить серийный номер камеры можно либо из
+     * файла операционной системы, либо с помощью SDK Axis axparameter 
+     */
+
     // 1. Инициализация libevent
     struct event_base* base = event_base_new();
     if (!base) {
@@ -66,7 +73,7 @@ int main() {
 
     // 7. ОСТАНОВКА: Сюда попадем только после signal_handler -> loopbreak
     syslog(LOG_NOTICE, "Waiting for MathEngine to finish...");
-    pthread_join(math_thread_id, NULL); // Теперь это в правильном месте
+    pthread_join(math_thread_id, NULL);
 
     syslog(LOG_NOTICE, "%s stopped gracefully.", APP_NAME_STR);
     event_base_free(base);

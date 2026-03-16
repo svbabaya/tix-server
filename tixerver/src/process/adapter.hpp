@@ -1,5 +1,5 @@
-#ifndef TRAFFCOUNTER_HPP
-#define TRAFFCOUNTER_HPP
+#ifndef ADAPTER_HPP
+#define ADAPTER_HPP
 
 #include "app_context.hpp"
 #include "rowMatClass.hpp"
@@ -7,7 +7,7 @@
 
 #include <vector>
 
-class TraffCounter {
+class Adapter {
 private:
     // Внутренняя копия настроек (Snapshot)
     // Хранит список сенсоров, их координаты и индивидуальные параметры
@@ -33,8 +33,8 @@ private:
     void saveHistoryToCSV(); // Приватный метод записи через POSIX write
 
 public:
-    TraffCounter();
-    ~TraffCounter() = default;
+    Adapter();
+    ~Adapter() = default;
 
     /**
      * Копирование настроек из контекста во внутреннее состояние.
@@ -57,4 +57,4 @@ public:
     size_t getActiveSensorsCount() const { return internalConfig.sensors.size(); }
 };
 
-#endif // TRAFFCOUNTER_HPP
+#endif // ADAPTER_HPP

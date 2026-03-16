@@ -1,5 +1,5 @@
 #include "math_engine.hpp"
-#include "traffcounter.hpp"
+#include "adapter.hpp"
 #include "capture_factory.hpp" 
 #include "algo_params.hpp"
 
@@ -16,7 +16,7 @@ void* MathEngine::run_thread(void* arg) {
 
 void MathEngine::processing_loop(AppContext* ctx) {
 
-    TraffCounter traffCounter;
+    Adapter adapter;
 
     auto capturer = CaptureFactory::create();
 
@@ -38,13 +38,13 @@ void MathEngine::processing_loop(AppContext* ctx) {
             GlobalConfig currentCfg = ctx->algoSettings.getSnapshot();
             
             // ШАГ 2: Передаем весь конфиг (со списком сенсоров) в TraffCounter
-            traffCounter.updateSettings(currentCfg);
+            adapter.updateSettings(currentCfg);
 
             // ШАГ 3: Обработка кадра (теперь итерируется по всем сенсорам внутри)
-            traffCounter.processFrame(frame);
+            adapter.processFrame(frame);
             
             // ШАГ 4: Синхронизация результатов в AppContext под мьютексом результатов
-            traffCounter.syncResultsIfNeeded(ctx->results);
+            adapter.syncResultsIfNeeded(ctx->results);
 
         } else {
             // Разгрузка CPU MIPS при отсутствии кадров

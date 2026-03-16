@@ -1,7 +1,8 @@
 #ifndef SYSTEM_CONSTANTS_HPP
 #define SYSTEM_CONSTANTS_HPP
 
-// #define TraffiX_TRACKER
+// Macros TraffiX_TRACKER definit in makefile.{camera_type}
+
 #define COMPENSATE_LIGHTCHANGE 1 //Включить компенсацию быстрого изменения яркости
 
 namespace SysConst {

@@ -19,7 +19,7 @@ CJSON_DIR = /Users/sergebabayan/vscode-workspace/tix-server/tixerver/libs/cjson
 OPENCV_DIR = /home/sergebabayan.linux/opencv341/build.mipsisa32r2el/install
 
 # Поддиректории для VPATH и Includes
-SUBDIRS = . src/common src/capture src/network src/maths
+SUBDIRS = src src/common src/capture src/network src/maths
 VPATH = $(SUBDIRS)
 INC_FLAGS = $(addprefix -I, $(SUBDIRS))
 

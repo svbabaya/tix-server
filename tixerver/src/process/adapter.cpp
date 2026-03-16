@@ -1,4 +1,4 @@
-#include "traffcounter.hpp"
+#include "adapter.hpp"
 
 #include <sys/time.h>
 #include <sys/statvfs.h>
@@ -11,7 +11,7 @@
 /**
  * Конструктор: инициализация таймеров и резервирование RAM.
  */
-TraffCounter::TraffCounter() 
+Adapter::Adapter() 
     : totalObjects(0), currentScore(0.0), fileCounter(0) {
     lastSyncTime = getCurrentMillis();
     
@@ -22,7 +22,7 @@ TraffCounter::TraffCounter()
 /**
  * Вспомогательный метод для времени.
  */
-long TraffCounter::getCurrentMillis() {
+long Adapter::getCurrentMillis() {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
@@ -32,12 +32,12 @@ long TraffCounter::getCurrentMillis() {
  * Синхронизация: забираем Snapshot настроек из AppContext.
  * Теперь работаем с GlobalConfig (список сенсоров).
  */
-void TraffCounter::updateSettings(const GlobalConfig& cfg) {
+void Adapter::updateSettings(const GlobalConfig& cfg) {
 
     /*** Debug */
     // Если количество сенсоров изменилось или это первая загрузка
     if (this->internalConfig.sensors.size() != cfg.sensors.size()) {
-        syslog(LOG_NOTICE, "[TraffCounter] Local config updated: %lu -> %lu sensors", 
+        syslog(LOG_NOTICE, "[Adapter] Local config updated: %lu -> %lu sensors", 
                (unsigned long)this->internalConfig.sensors.size(), 
                (unsigned long)cfg.sensors.size());
     }
@@ -49,7 +49,7 @@ void TraffCounter::updateSettings(const GlobalConfig& cfg) {
 /**
  * Основная обработка: итерируемся по всем активным сенсорам.
  */
-void TraffCounter::processFrame(const Frame& frame) {
+void Adapter::processFrame(const Frame& frame) {
 
     /*** Debug */
     static bool firstRunAfterConfig = false;
@@ -106,10 +106,10 @@ void TraffCounter::processFrame(const Frame& frame) {
 /**
  * Редкая синхронизация (раз в 10 секунд) с результатами в AppContext.
  */
-void TraffCounter::syncResultsIfNeeded(MathResults& globalResults) {
+void Adapter::syncResultsIfNeeded(MathResults& globalResults) {
     long now = getCurrentMillis();
     
-    if (now - lastSyncTime >= 10000) { // Используем 10000мс напрямую
+    if (now - lastSyncTime >= 10000) { // Используем 10000 мс напрямую
         pthread_mutex_lock(&globalResults.lock);
         globalResults.objects_detected = totalObjects;
         globalResults.last_score = currentScore;
@@ -125,7 +125,7 @@ void TraffCounter::syncResultsIfNeeded(MathResults& globalResults) {
 /**
  * Сохранение в CSV с ротацией файлов и проверкой места.
  */
-void TraffCounter::saveHistoryToCSV() {
+void Adapter::saveHistoryToCSV() {
     if (frameHistory.empty()) return;
 
     const char* targetPath = "/tmp";
