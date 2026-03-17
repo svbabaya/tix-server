@@ -5,6 +5,7 @@
 #include "capture_params.hpp"
 #include "command_processor.hpp"
 #include "algo_params.hpp"
+#include "math_results.hpp"
 #include "network_params.hpp"
 
 #include <pthread.h>
@@ -47,22 +48,6 @@ struct AlgoSettings {
         /*** end Debug */
 
         pthread_mutex_unlock(&lock);
-    }
-};
-
-/**
- * Результаты обработки (то, что уходит клиенту по TCP)
- */
-struct MathResults {
-    int objects_detected;
-    double last_score;
-    pthread_mutex_t lock;
-
-    MathResults() : objects_detected(0), last_score(0.0) {
-        pthread_mutex_init(&lock, NULL);
-    }
-    ~MathResults() {
-        pthread_mutex_destroy(&lock);
     }
 };
 

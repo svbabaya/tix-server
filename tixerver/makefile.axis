@@ -46,7 +46,7 @@ APP_DEFS = -DAPP_NAME_STR=\"$(APP_NAME)\" -DAPP_VER_STR=\"$(APP_VER)\" \
 
 # Список общих объектов
 COMMON_OBJECTS = main.o camera_info.o network_server.o math_engine.o \
-                 command_processor.o rowMatClass.o adapter.o \
+                 command_processor.o rowMatClass.o adapter.o math_results.o \
                  parser_config.o capture_factory.o cJSON.o capture_axis.o
 
 # Логика выбора архитектуры

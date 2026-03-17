@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstring>
 #include <syslog.h>
+#include <mutex>
 
 /**
  * Конструктор: инициализация таймеров и резервирование RAM.
@@ -110,16 +111,14 @@ void Adapter::syncResultsIfNeeded(MathResults& globalResults) {
     long now = getCurrentMillis();
     
     if (now - lastSyncTime >= 10000) { // Используем 10000 мс напрямую
-        pthread_mutex_lock(&globalResults.lock);
+        std::lock_guard<std::mutex> lock(globalResults.lock);
         globalResults.objects_detected = totalObjects;
         globalResults.last_score = currentScore;
-        pthread_mutex_unlock(&globalResults.lock);
-
-        syslog(LOG_INFO, "[Adapter] Sync: Total=%d, ActiveSensors=%lu", 
-               totalObjects, (unsigned long)internalConfig.sensors.size());
-
-        lastSyncTime = now;
     }
+    syslog(LOG_INFO, "[Adapter] Sync: Total=%d, ActiveSensors=%lu", 
+            totalObjects, (unsigned long)internalConfig.sensors.size());
+
+    lastSyncTime = now;
 }
 
 /**

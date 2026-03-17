@@ -1,6 +1,7 @@
 #include "command_processor.hpp"
 #include "app_context.hpp"
 
+#include <mutex>
 #include <cstdio>
 
 CommandProcessor::CommandProcessor() {
@@ -12,63 +13,73 @@ CommandProcessor::CommandProcessor() {
 }
 
 std::string CommandProcessor::execute(const std::string& cmd, AppContext* ctx) {
-    if (_handlers.count(cmd)) {
-        return _handlers[cmd](ctx);
+    auto it = _handlers.find(cmd);
+    if (it != _handlers.end()) {
+        return it->second(ctx);
     }
     return "{\"error\": \"unknown_command\"}\n";
 }
 
-std::string CommandProcessor::handleGE(AppContext* ctx) {
-    pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
-    pthread_mutex_unlock(&ctx->results.lock);
-
+// Вспомогательная функция, чтобы не дублировать sprintf (опционально)
+static std::string formatResponse(const char* label, int count, double score) {
     char resp[128];
-    sprintf(resp, "{\"ge\": %d, \"score\": %.2f}\n", count, score);
+    // snprintf безопаснее старого sprintf
+    snprintf(resp, sizeof(resp), "{\"%s\": %d, \"score\": %.2f}\n", label, count, score);
     return std::string(resp);
+}
+
+std::string CommandProcessor::handleGE(AppContext* ctx) {
+    int count;
+    double score;
+    {
+        // RAII-блокировка: захват при создании, освобождение при выходе из {}
+        std::lock_guard<std::mutex> lock(ctx->results.lock);
+        count = ctx->results.objects_detected;
+        score = ctx->results.last_score;
+    } 
+    return formatResponse("ge", count, score);
 }
 
 std::string CommandProcessor::handleGE2(AppContext* ctx) {
-    pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
-    pthread_mutex_unlock(&ctx->results.lock);
-
-    char resp[128];
-    sprintf(resp, "{\"ge2\": %d, \"score\": %.2f}\n", count, score);
-    return std::string(resp);
+    int count;
+    double score;
+    {
+        std::lock_guard<std::mutex> lock(ctx->results.lock);
+        count = ctx->results.objects_detected;
+        score = ctx->results.last_score;
+    }
+    return formatResponse("ge2", count, score);
 }
 
 std::string CommandProcessor::handleGS(AppContext* ctx) {
-    pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
-    pthread_mutex_unlock(&ctx->results.lock);
-
-    char resp[128];
-    sprintf(resp, "{\"gs\": %d, \"score\": %.2f}\n", count, score);
-    return std::string(resp);
+    int count;
+    double score;
+    {
+        std::lock_guard<std::mutex> lock(ctx->results.lock);
+        count = ctx->results.objects_detected;
+        score = ctx->results.last_score;
+    }
+    return formatResponse("gs", count, score);
 }
 
 std::string CommandProcessor::handleGK(AppContext* ctx) {
-    pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
-    pthread_mutex_unlock(&ctx->results.lock);
-
-    char resp[128];
-    sprintf(resp, "{\"gk\": %d, \"score\": %.2f}\n", count, score);
-    return std::string(resp);
+    int count;
+    double score;
+    {
+        std::lock_guard<std::mutex> lock(ctx->results.lock);
+        count = ctx->results.objects_detected;
+        score = ctx->results.last_score;
+    }
+    return formatResponse("gk", count, score);
 }
 
 std::string CommandProcessor::handleGL(AppContext* ctx) {
-    pthread_mutex_lock(&ctx->results.lock);
-    int count = ctx->results.objects_detected;
-    double score = ctx->results.last_score;
-    pthread_mutex_unlock(&ctx->results.lock);
-
-    char resp[128];
-    sprintf(resp, "{\"gl\": %d, \"score\": %.2f}\n", count, score);
-    return std::string(resp);
+    int count;
+    double score;
+    {
+        std::lock_guard<std::mutex> lock(ctx->results.lock);
+        count = ctx->results.objects_detected;
+        score = ctx->results.last_score;
+    }
+    return formatResponse("gl", count, score);
 }
