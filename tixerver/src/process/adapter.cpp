@@ -58,7 +58,7 @@ void Adapter::processFrame(const Frame& frame) {
         return;
     }
     if (firstRunAfterConfig) {
-        syslog(LOG_INFO, "[TraffCounter] Processing FIRST frame with sensor ID: %d (Thr: %d)", 
+        syslog(LOG_INFO, "[Adapter] Processing FIRST frame with sensor ID: %d (Thr: %d)", 
                internalConfig.sensors[0].id, internalConfig.sensors[0].params.binarizationThreshold);
         firstRunAfterConfig = false;
     }
@@ -115,7 +115,7 @@ void Adapter::syncResultsIfNeeded(MathResults& globalResults) {
         globalResults.last_score = currentScore;
         pthread_mutex_unlock(&globalResults.lock);
 
-        syslog(LOG_INFO, "[TraffCounter] Sync: Total=%d, ActiveSensors=%lu", 
+        syslog(LOG_INFO, "[Adapter] Sync: Total=%d, ActiveSensors=%lu", 
                totalObjects, (unsigned long)internalConfig.sensors.size());
 
         lastSyncTime = now;
