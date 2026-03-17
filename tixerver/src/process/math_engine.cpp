@@ -5,7 +5,6 @@
 
 #include <syslog.h>
 #include <unistd.h>
-// #include <thread>   // C++11: управление потоками
 #include <memory>   // C++11: для smart pointers
 
 /**
@@ -35,14 +34,15 @@ void MathEngine::processing_loop(AppContext* ctx) {
         return;
     }
     
-    syslog(LOG_NOTICE, "MathEngine: Processing started (C++11 Multi-Sensor Mode)");
+    syslog(LOG_NOTICE, "MathEngine: Processing started (Multi-Sensor Mode)");
 
     // Используем атомарный метод load() для безопасной проверки флага из другого потока
     while (ctx->running.load()) {
         Frame frame = capturer->handle();
         
         if (!frame.empty()) {
-            // ШАГ 1: Забираем снимок настроек (метод должен быть внутри защищен мьютексом)
+            // ШАГ 1: Забираем снимок настроек (Snapshot) для текущего кадра.
+            // Метод getSnapshot() сам внутри захватывает и отпускает мьютекс
             GlobalConfig currentCfg = ctx->algoSettings.getSnapshot();
             
             // ШАГ 2: Обновляем настройки алгоритмов
@@ -56,7 +56,7 @@ void MathEngine::processing_loop(AppContext* ctx) {
             adapter.syncResultsIfNeeded(ctx->results);
 
         } else {
-            // C++11: Безопасная пауза потока на 20 миллисекунд для разгрузки CPU при отсутствии кадров
+            // Безопасная пауза потока на 20 миллисекунд для разгрузки CPU при отсутствии кадров
             usleep(20000); 
         }
     }
