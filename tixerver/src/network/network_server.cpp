@@ -15,22 +15,15 @@ extern "C" {
 #include <stdlib.h>
 #include <cstring>
 
-
 // --- HTTP Обработчики ---
 
 // GET /api/info -> CameraInfo
 void http_get_info_cb(struct evhttp_request* req, void* arg) {
 
     AppContext* ctx = (AppContext*)arg;
-
     ctx->info = InfoCollector::collect();
-
-
-    // pthread_mutex_lock(&ctx->info.lock); 
     std::string json = ctx->info.toJson();
-    // pthread_mutex_unlock(&ctx->info.lock);
 
-    
     struct evbuffer* buf = evbuffer_new();
     evbuffer_add(buf, json.c_str(), (int)json.length());
     evhttp_add_header(evhttp_request_get_output_headers(req), "Content-Type", "application/json");

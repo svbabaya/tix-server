@@ -3,58 +3,67 @@
 #include "capture_factory.hpp" 
 #include "algo_params.hpp"
 
-#include <unistd.h>
 #include <syslog.h>
-#include <sys/time.h>
-#include <cstring>
+#include <unistd.h>
+// #include <thread>   // C++11: управление потоками
+#include <memory>   // C++11: для smart pointers
 
-void* MathEngine::run_thread(void* arg) {
-    AppContext* ctx = static_cast<AppContext*>(arg);
+/**
+ * Точка входа в поток. 
+ * В C++11 std::thread позволяет передавать AppContext* напрямую.
+ */
+void MathEngine::run_thread(AppContext* ctx) {
+    if (!ctx) {
+        syslog(LOG_ERR, "MathEngine: Context is null, cannot start.");
+        return;
+    }
     processing_loop(ctx);
-    return nullptr;
 }
 
+/**
+ * Основной цикл обработки
+ */
 void MathEngine::processing_loop(AppContext* ctx) {
-
     Adapter adapter;
 
+    // CaptureFactory возвращает std::unique_ptr или аналогичный объект
     auto capturer = CaptureFactory::create();
 
-    // Сработает, если фабрика вернула nullptr
-    // Проверка на nullptr обязательна, если камера не определена в сборке
+    // Проверка инициализации захвата видео
     if (!capturer || !capturer->open(ctx->capParams)) {
         syslog(LOG_ERR, "MathEngine: Capture initialization failed (No implementation or open error)!");
         return;
     }
     
-    syslog(LOG_NOTICE, "MathEngine: Processing started (Multi-Sensor Mode)");
+    syslog(LOG_NOTICE, "MathEngine: Processing started (C++11 Multi-Sensor Mode)");
 
+    // Используем атомарный метод load() для безопасной проверки флага из другого потока
     while (ctx->running.load()) {
         Frame frame = capturer->handle();
         
         if (!frame.empty()) {
-            // ШАГ 1: Забираем актуальный снимок настроек (Snapshot)
-            // Метод getSnapshot() сам внутри захватывает и отпускает мьютекс
+            // ШАГ 1: Забираем снимок настроек (метод должен быть внутри защищен мьютексом)
             GlobalConfig currentCfg = ctx->algoSettings.getSnapshot();
             
-            // ШАГ 2: Передаем весь конфиг (со списком сенсоров) в TraffCounter
+            // ШАГ 2: Обновляем настройки алгоритмов
             adapter.updateSettings(currentCfg);
 
-            // ШАГ 3: Обработка кадра (теперь итерируется по всем сенсорам внутри)
+            // ШАГ 3: Обработка кадра
             adapter.processFrame(frame);
             
-            // ШАГ 4: Синхронизация результатов в AppContext под мьютексом результатов
+            // ШАГ 4: Синхронизация результатов. 
+            // ВАЖНО: Внутри syncResultsIfNeeded должен быть std::lock_guard<std::mutex>
             adapter.syncResultsIfNeeded(ctx->results);
 
         } else {
-            // Разгрузка CPU MIPS при отсутствии кадров
+            // C++11: Безопасная пауза потока на 20 миллисекунд для разгрузки CPU при отсутствии кадров
             usleep(20000); 
         }
     }
 
-    // СЮДА поток попадет ТОЛЬКО после получения сигнала
+    // Сюда попадем после того, как основной поток вызовет ctx->stop()
     syslog(LOG_NOTICE, "MathEngine: Thread exiting gracefully.");
 
-    // Обращение через -> (хотя unique_ptr сам закроет при выходе из функции)
-    capturer->close(); // Явное закрытие ресурсов видео
+    // Явное освобождение ресурсов захвата
+    capturer->close(); 
 }

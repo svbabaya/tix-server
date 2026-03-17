@@ -5,11 +5,10 @@
 
 class MathEngine {
 public:
-    // Теперь принимаем AppContext* напрямую вместо void*
-    static void run_thread(AppContext* ctx); 
+    static void* run_thread(void* arg);
 
 private:
     static void processing_loop(AppContext* ctx);
 };
 
-#endif
+#endif // MATH_ENGINE_HPP
