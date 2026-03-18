@@ -1,10 +1,28 @@
 # Makefile for building tixerver for Axis only
-# Usage: make ARCH=MIPS SN=00408C123456 release
+
+# Использование: 
+# make -f makefile.axis ARCH=MIPS SN=00408C123456 clean release
+# make -f makefile.axis ARCH=MIPS SN=free clean release
+
+# Список макросов, которые передаются в код: 
+# APP_NAME_STR - название приложения из package.conf
+# APP_VER_STR - версия приложения из package.conf
+# SERIAL_NUMBER - значение ключа SN, которое может быть либо строкой из 12 символов,
+# то есть ожидаемым серийным номером, либо иметь значение "free", тогда приложение
+# не привязывается к определенной камере
+# CAMERA_AXIS - установлен всегда по умолчанию для камер Axis, влияет на работу фабрики,
+# чтобы для компиляции были выбраны модули, работающие с SDK Axis
 
 # 0. Настройки по умолчанию
 ARCH ?= MIPS
 SN ?= free
 .DEFAULT_GOAL := release_default
+
+ifeq ($(TARGET), mipsisa32r2el-axis-linux-gnu)
+    ARCH = MIPS
+else ifeq ($(TARGET), armv7-axis-linux-gnueabihf)
+    ARCH = ARMV7HF
+endif
 
 # 1. Проверка архитектуры
 SUPPORTED_ARCHS = MIPS ARMV7HF
@@ -40,7 +58,7 @@ MINOR := $(shell grep "APPMINORVERSION" package.conf | cut -d'=' -f2 | tr -d '"'
 MICRO := $(shell grep "APPMICROVERSION" package.conf | cut -d'=' -f2 | tr -d '"' | tr -d '\r')
 APP_VER := $(MAJOR).$(MINOR).$(MICRO)
 
-# Макросы (добавлен SERIAL_NUMBER)
+# Макросы
 APP_DEFS = -DAPP_NAME_STR=\"$(APP_NAME)\" -DAPP_VER_STR=\"$(APP_VER)\" \
            -DSERIAL_NUMBER=\"$(SN)\" -DCAMERA_AXIS
 

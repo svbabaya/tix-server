@@ -31,6 +31,7 @@ int main() {
      * сделать syslog и завершить работу приложения. Получить серийный номер камеры можно либо из
      * файла операционной системы, либо с помощью SDK Axis axparameter 
      */
+     syslog(LOG_NOTICE, "Expected serial number: %s", SERIAL_NUMBER); // SERIAL_NUMBER - макрос из makefile, который может быть "free" или конкретным серийным номером камеры
     
      // 1. Инициализация libevent
     struct event_base* base = event_base_new();
