@@ -30,7 +30,11 @@ ifeq ($(filter $(ARCH),$(SUPPORTED_ARCHS)),)
   $(error Invalid ARCH: "$(ARCH)". Please use ARCH=MIPS or ARCH=ARMV7HF)
 endif
 
-# 2. Проверка серийного номера (SN)
+# 2. Проверка серийного номера (SN) 
+# Если сборка запускается с помощью скрипта create-package.sh, то валидация 
+# серийного номера производится в скрипте. Возможно имеет смысл всегда пользоваться
+# скриптом для сборки, чтобы не допустить ошибку при ручной сборке и тогда убрать
+# этот фрагмент кода:
 ifneq ($(SN), free)
   ifeq ($(shell echo "$(SN)" | grep -xE '[0-9a-fA-F]{12}'),)
     $(error Invalid SN: "$(SN)". Must be 'free' or a 12-digit hex number)
