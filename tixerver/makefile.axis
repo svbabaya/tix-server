@@ -91,10 +91,11 @@ endif
 
 SPECIFIC_LDLIBS = -lcapture
 
-# Пути для работы библиотеки axparameter
-AXIS_INC = -I$(AXIS_TOP_DIR)/usr/include/axsdk \
-           -I$(AXIS_TOP_DIR)/usr/include/glib-2.0 \
-           -I$(AXIS_TOP_DIR)/usr/lib/glib-2.0/include
+# Пути для работы библиотеки axparameter, $(prefix) устанавливает Axis SDK 
+# в зависимости от выбранной архитектуры 
+AXIS_INC = -I$(prefix)/usr/include/axsdk \
+           -I$(prefix)/usr/include/glib-2.0 \
+           -I$(prefix)/usr/lib/glib-2.0/include
 
 # 5. ФОРМИРОВАНИЕ ФЛАГОВ
 COMMON_FLAGS = $(APP_DEFS) $(INC_FLAGS) $(AXIS_INC) -Wall -Wextra -Werror -pedantic \

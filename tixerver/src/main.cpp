@@ -26,19 +26,26 @@ int main() {
     openlog("TiXerver", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_NOTICE, "%s version %s starting...", APP_NAME_STR, APP_VER_STR); // Данные из макросов makefile
 
-    /* ToDo Проверить значение макроса SN, полученного из makefile. Если значение free,
-     * значит привязки к серийному номеру быть не должно и работа main продолжаетс, но если
-     * в SN есть серийный номер, нужно сравнить его с серийным номером камеры и при несовпадении
-     * сделать syslog и завершить работу приложения. Получить серийный номер камеры можно либо из
-     * файла операционной системы, либо с помощью SDK Axis axparameter 
-     */
-    syslog(LOG_NOTICE, "Expected serial number: %s", SERIAL_NUMBER); // SERIAL_NUMBER - макрос из makefile, который может быть "free" или конкретным серийным номером камеры
-    
+    /* Check serial number */
+    std::string expected_sn = SERIAL_NUMBER; // SERIAL_NUMBER может быть "free" или 12-значной строкой
     std::string sn = getCameraSerialNumber();
-    if (!sn.empty()) {
-        // std::cout << "Camera Serial Number: " << sn << std::endl;
-        syslog(LOG_NOTICE, "Actual serial number: %s", sn);
+
+    syslog(LOG_NOTICE, "Expected serial number: %s", expected_sn.c_str());
+
+    if (sn.empty()) {
+        syslog(LOG_WARNING, "The app %s can't read the camera's serial number and will be stopped!", APP_NAME_STR);
+        return 0;
     }
+
+    syslog(LOG_NOTICE, "Actual serial number: %s", sn.c_str());
+
+    if (expected_sn != "free" && sn != expected_sn) {
+        syslog(LOG_WARNING, "The app %s is not intended for this camera and will be stopped!", APP_NAME_STR);
+        return 0;
+    }
+    /* end Check serial number */
+
+    syslog(LOG_NOTICE, "Serial number verified. Starting application...");
 
      // 1. Инициализация libevent
     struct event_base* base = event_base_new();

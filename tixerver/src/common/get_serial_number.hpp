@@ -5,6 +5,12 @@
 #include <glib.h>
 #include <string>
 
+/* 
+* Функция предназначена для получения серийного номера камеры с помощью
+* библиотеки axparameter SDK Axis, которая использует glib. Поэтому
+* makefile.axis подключаются обе библиотеки.
+*/
+
 std::string getCameraSerialNumber() {
     GError* error = nullptr;
     AXParameter* ax_param = ax_parameter_new(APP_NAME_STR, &error);
