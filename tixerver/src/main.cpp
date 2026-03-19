@@ -1,9 +1,10 @@
 #include "app_context.hpp"
 #include "network_server.hpp"
 #include "math_engine.hpp"
+#include "get_serial_number.hpp"
 
-#include <thread>   // C++11
-#include <atomic>   // C++11
+#include <thread>
+#include <atomic>
 #include <syslog.h>
 #include <event2/event.h>
 #include <signal.h>
@@ -31,8 +32,14 @@ int main() {
      * сделать syslog и завершить работу приложения. Получить серийный номер камеры можно либо из
      * файла операционной системы, либо с помощью SDK Axis axparameter 
      */
-     syslog(LOG_NOTICE, "Expected serial number: %s", SERIAL_NUMBER); // SERIAL_NUMBER - макрос из makefile, который может быть "free" или конкретным серийным номером камеры
+    syslog(LOG_NOTICE, "Expected serial number: %s", SERIAL_NUMBER); // SERIAL_NUMBER - макрос из makefile, который может быть "free" или конкретным серийным номером камеры
     
+    std::string sn = getCameraSerialNumber();
+    if (!sn.empty()) {
+        // std::cout << "Camera Serial Number: " << sn << std::endl;
+        syslog(LOG_NOTICE, "Actual serial number: %s", sn);
+    }
+
      // 1. Инициализация libevent
     struct event_base* base = event_base_new();
     if (!base) {

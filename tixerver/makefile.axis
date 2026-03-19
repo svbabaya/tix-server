@@ -91,8 +91,13 @@ endif
 
 SPECIFIC_LDLIBS = -lcapture
 
+# Пути для работы библиотеки axparameter
+AXIS_INC = -I$(AXIS_TOP_DIR)/usr/include/axsdk \
+           -I$(AXIS_TOP_DIR)/usr/include/glib-2.0 \
+           -I$(AXIS_TOP_DIR)/usr/lib/glib-2.0/include
+
 # 5. ФОРМИРОВАНИЕ ФЛАГОВ
-COMMON_FLAGS = $(APP_DEFS) $(INC_FLAGS) -Wall -Wextra -Werror -pedantic \
+COMMON_FLAGS = $(APP_DEFS) $(INC_FLAGS) $(AXIS_INC) -Wall -Wextra -Werror -pedantic \
                -I$(LIBEVENT_DIR)/include \
                -I$(CJSON_DIR) \
                -I$(OPENCV_DIR)/include
@@ -107,7 +112,8 @@ LDFLAGS += -L$(prefix)/lib -L$(prefix)/usr/lib
 LDFLAGS += -Wl,-rpath-link,$(prefix)/usr/lib:$(prefix)/lib
 
 OPENCV_MIN_LIBS = -lopencv_core -lzlib
-LDLIBS = -levent $(OPENCV_MIN_LIBS) -lpthread $(SPECIFIC_LDLIBS) -lrt -lm -ldl $(LIBS)
+LDLIBS = -levent $(OPENCV_MIN_LIBS) -lpthread $(SPECIFIC_LDLIBS) -lrt -lm -ldl $(LIBS) \
+         -laxparameter -lglib-2.0
 
 TARGET = tixerver
 

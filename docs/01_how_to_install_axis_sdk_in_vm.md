@@ -130,4 +130,4 @@ doMakeTheTar() {
 Теперь пакет будет выглядеть так:
 TiXerver_1_0-1_mipsisa32r2el_00408CE86871.eap
 TiXerver_1_0-1_armv7hf_free.eap
-Название приложения и версия берутся из файла package.conf
+Название приложения и версию скрипт берет из файла package.conf
