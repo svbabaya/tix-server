@@ -20,9 +20,9 @@
 и производит валидацию по правилу: второй аргумент это либо free, либо 12-значное 16-ричное число без пробелов. Если второго аргумента нет, то по умолчанию это free.
 ```
 # Обработка и валидация SN перед циклом
-RAW_SN="${2:-free}"                  # Если пусто — free
-RAW_SN="${RAW_SN#*=}"                # Убираем "SN=", если оно было введено
-SN=$(echo "$RAW_SN" | tr 'a-f' 'A-F') # В верхний регистр
+RAW_SN="${2:-free}" # Если пусто — free
+RAW_SN="${RAW_SN#*=}" # Убираем "SN=", если оно было введено
+SN=$(echo "$RAW_SN" | tr '[:lower:]' '[:upper:]') # В верхний регистр
 
 # Валидация: только "FREE" или 12 символов HEX
 if [[ "$SN" != "FREE" ]] && [[ ! "$SN" =~ ^[0-9A-F]{12}$ ]]; then
@@ -68,7 +68,7 @@ fi
 TARGET=$target: Передает полное имя архитектуры (например, mipsisa32r2el-axis-linux-gnu) внутрь makefile.axis 
 SN=$SN: Передает в makefile.axis значение SN
 - Сохраняем изменения
-- Открывает **makefile.axis** и формируем ARCH на основе переданной из скрипта архитектуры:
+- Открываем **makefile.axis** и формируем макрос ARCH на основе переданной из скрипта архитектуры:
 ```
 ifeq ($(TARGET), mipsisa32r2el-axis-linux-gnu)
     ARCH = MIPS
@@ -83,12 +83,13 @@ $ create-package.sh armv7hf free
 $ create-package.sh armv7hf 00408CE86871
 $ create-package.sh mipsisa32r2el // по умолчанию в makefile.axis будет передан SN=free
 
-- При запуске create-package.sh возможна ошибка `Bad substitution` из-за того, что синтаксис [[ ]] и ${@:2} поддерживается в Bash, но недопустим в стандартном sh/dash. Чтобы исправить ситуацию либо запускаем скрипт через bash: `$ bash create-package.sh armv7hf free`
-Либо меняем первую строчку скрипта (Shebang):
+### Дополнительная информация:
+- При запуске create-package.sh возможна ошибка `Bad substitution` из-за того, что синтаксис [[ ]] и ${@:2} поддерживается в Bash, но недопустим в стандартном sh/dash. Чтобы исправить ситуацию, либо запускаем скрипт через bash: `$ bash create-package.sh armv7hf free`,
+либо меняем первую строчку скрипта (Shebang):
 Было: `#!/bin/sh -e`
 Стало: `#!/bin/bash -e`
 
-- Рекомендуется указывать серийный номер камеры в имени eap-пакета, для этого в **create-package.sh** добавляем еще один аргумент при вызове скрипта **eap-create.sh**, а именно
+- Чтобы серийный номер был включен в имя eap-пакета, открываем в редакторе скрипт **create-package.sh** и добавляем еще один аргумент при вызове скрипта **eap-create.sh**, а именно:
 1.1 Меняем строку:
 `\command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET || `dirname $0`/eap-create.sh $TARGET`
 на
@@ -96,13 +97,13 @@ $ create-package.sh mipsisa32r2el // по умолчанию в makefile.axis б
 
 1.2 Открываем **eap-create.sh**
 
-1.3 Перед определением функции doMakeTheTar() добавляем переменную SN_PARAM,
-а внутри функции doMakeTheTar() меняем код:
+1.3 Перед определением функции **doMakeTheTar()** добавляем переменную SN_PARAM, которая принимает второй параметр,
+а внутри функции **doMakeTheTar()** меняем код в выделенной области:
 ```
 SN_PARAM="$2"
 doMakeTheTar() {
         local tarb
-
+#----------------------------------------
         # 1. Формируем базу: Имя + Версия
         tarb=$(echo "$PACKAGENAME" | \sed 's/ /_/g')
         if [ "$APPMAJORVERSION" ] && [ "$APPMINORVERSION" ]; then
@@ -122,7 +123,7 @@ doMakeTheTar() {
 
         # 4. Добавляем расширение
         tarb="${tarb}.eap"
-
+#----------------------------------------
         LUAPKGFILES=
         # ... остальной код функции
 }

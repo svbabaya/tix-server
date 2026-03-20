@@ -22,7 +22,7 @@ Digest: sha256:c1f43eb9f5a6625437e1774f420ef7ae6ec37491f93ef132d11636d99a54848b
 Status: Downloaded newer image for 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
 ```
-Далее будет предложено сделать анализ безопасности docker image, этот шаг можно пропустить.
+Далее будет предложено сделать анализ безопасности docker image, этот шаг вероятно лучше пропустить.
 ```
 What's next:
     View a summary of image vulnerabilities and recommendations → docker scout quickview 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
