@@ -9,6 +9,8 @@
 # $ create-package.sh armv7hf free
 # $ create-package.sh armv7hf 00408CE67850
 # 
+
+# ToDo Убрать возможность такой сборки, оставить только для значений по умолчанию ARCH=MIPS, SN=free
 # Запускать сборку напрямую с помощью makefile.axis можно если ранее уже запускался create-package.sh 
 # и в директории проекта появился файл .target-makefrag, который указывает на определенный toolchain.
 # В такой ситуации пакет eap создан не будет, то есть можно будет только отладить процесс компиляции.
@@ -16,43 +18,26 @@
 # make -f makefile.axis ARCH=MIPS SN=00408C123456 clean release
 # make -f makefile.axis ARCH=MIPS SN=free clean release
 
-# Список макросов, которые передаются в код: 
 # APP_NAME_STR - название приложения из package.conf
 # APP_VER_STR - версия приложения из package.conf
 # SERIAL_NUMBER - значение ключа SN, которое может быть либо строкой из 12 символов,
 # то есть ожидаемым серийным номером, либо иметь значение "free", тогда приложение
-# не привязывается к определенной камере
+# не привязывается к определенной камере. Передается в приложение.
 # CAMERA_AXIS - установлен всегда по умолчанию для камер Axis, влияет на работу фабрики,
-# чтобы для компиляции были выбраны модули, работающие с SDK Axis
+# чтобы для компиляции были выбраны модули, работающие с SDK Axis. Передается в приложение
 
-$(info LOG: Проверка параметров в Makefile: TARGET=$(TARGET), SN=$(SN))
+# $(info LOG: Проверка параметров в Makefile: TARGET=$(TARGET), SN=$(SN))
 
 # 0. Настройки по умолчанию
-ARCH ?= MIPS
+ARCH ?= MIPS # Можно заменить на ARMV7HF для проверки компиляции без создания .eap
 SN ?= free
 .DEFAULT_GOAL := release_default
 
+# TARGET - это обозначение тулчейна, которое принимается из скрипта create-package.sh
 ifeq ($(TARGET), mipsisa32r2el-axis-linux-gnu)
     ARCH = MIPS
 else ifeq ($(TARGET), armv7-axis-linux-gnueabihf)
     ARCH = ARMV7HF
-endif
-
-# 1. Проверка архитектуры
-SUPPORTED_ARCHS = MIPS ARMV7HF
-ifeq ($(filter $(ARCH),$(SUPPORTED_ARCHS)),)
-  $(error Invalid ARCH: "$(ARCH)". Please use ARCH=MIPS or ARCH=ARMV7HF)
-endif
-
-# 2. Проверка серийного номера (SN) 
-# Если сборка запускается с помощью скрипта create-package.sh, то валидация 
-# серийного номера производится в скрипте. Возможно имеет смысл всегда пользоваться
-# скриптом для сборки, чтобы не допустить ошибку при ручной сборке и тогда убрать
-# этот фрагмент кода:
-ifneq ($(SN), free)
-  ifeq ($(shell echo "$(SN)" | grep -xE '[0-9a-fA-F]{12}'),)
-    $(error Invalid SN: "$(SN)". Must be 'free' or a 12-digit hex number)
-  endif
 endif
 
 export AXIS_TOP_DIR = /home/sergebabayan.linux/axis/emb-app-sdk_2_0_3
@@ -76,9 +61,26 @@ MINOR := $(shell grep "APPMINORVERSION" package.conf | cut -d'=' -f2 | tr -d '"'
 MICRO := $(shell grep "APPMICROVERSION" package.conf | cut -d'=' -f2 | tr -d '"' | tr -d '\r')
 APP_VER := $(MAJOR).$(MINOR).$(MICRO)
 
+# Формируем SERIAL_NUMBER для передачи в код
+# Если SN = free, то передаем "free"
+# Если SN = hex-число, то передаем "00408CE86871"
+SERIAL_NUMBER_STR := $(SN)
+ifeq ($(SN), free)
+    # Для free передаем просто "free"
+    SERIAL_NUMBER_MACRO = -DSERIAL_NUMBER=\"free\"
+else
+    # Для серийного номера передаем "серийный_номер"
+    SERIAL_NUMBER_MACRO = -DSERIAL_NUMBER=\"$(SN)\"
+endif
+
 # Макросы
 APP_DEFS = -DAPP_NAME_STR=\"$(APP_NAME)\" -DAPP_VER_STR=\"$(APP_VER)\" \
-           -DSERIAL_NUMBER=\"$(SN)\" -DCAMERA_AXIS
+           $(SERIAL_NUMBER_MACRO) -DCAMERA_AXIS
+
+# Отладочный вывод
+$(info LOG: SN = $(SN))
+$(info LOG: SERIAL_NUMBER_MACRO = $(SERIAL_NUMBER_MACRO))
+$(info LOG: APP_DEFS = $(APP_DEFS))
 
 # Список общих объектов
 COMMON_OBJECTS = main.o camera_info.o network_server.o math_engine.o \
@@ -130,7 +132,7 @@ OPENCV_MIN_LIBS = -lopencv_core -lzlib
 LDLIBS = -levent $(OPENCV_MIN_LIBS) -lpthread $(SPECIFIC_LDLIBS) -lrt -lm -ldl $(LIBS) \
          -laxparameter -lglib-2.0
 
-TARGET = tixerver
+EXECUTABLE = $(APP_NAME)
 
 # --- ЦЕЛИ СБОРКИ ---
 release_default: clean release
@@ -139,15 +141,15 @@ all: debug
 
 debug: CXXFLAGS += -g -O0
 debug: CFLAGS += -g -O0
-debug: $(TARGET)
+debug: $(EXECUTABLE)
 
 release: CXXFLAGS += -O2
 release: CFLAGS += -O2
-release: $(TARGET)
-	$(STRIP) $(TARGET)
+release: $(EXECUTABLE)
+	$(STRIP) $(EXECUTABLE)
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LDFLAGS) $(LDLIBS) -o $(TARGET)
+$(EXECUTABLE): $(OBJECTS)
+	$(CXX) $(OBJECTS) $(LDFLAGS) $(LDLIBS) -o $(EXECUTABLE)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -156,6 +158,6 @@ cJSON.o: $(CJSON_DIR)/cJSON.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -f $(EXECUTABLE) $(OBJECTS)
 
 .PHONY: all debug release clean release_default

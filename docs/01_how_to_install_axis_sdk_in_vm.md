@@ -84,7 +84,7 @@ $ create-package.sh armv7hf 00408CE86871
 $ create-package.sh mipsisa32r2el // по умолчанию в makefile.axis будет передан SN=free
 
 ### Дополнительная информация:
-- При запуске create-package.sh возможна ошибка `Bad substitution` из-за того, что синтаксис [[ ]] и ${@:2} поддерживается в Bash, но недопустим в стандартном sh/dash. Чтобы исправить ситуацию, либо запускаем скрипт через bash: `$ bash create-package.sh armv7hf free`,
+- При запуске create-package.sh возможна ошибка `Bad substitution` и другие из-за того, что синтаксис [[ ]] и ${@:2} поддерживается в Bash, но недопустим в стандартном sh/dash. Чтобы исправить ситуацию, либо запускаем скрипт через bash: `$ bash create-package.sh armv7hf free`,
 либо меняем первую строчку скрипта (Shebang):
 Было: `#!/bin/sh -e`
 Стало: `#!/bin/bash -e`

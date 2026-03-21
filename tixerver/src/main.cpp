@@ -28,7 +28,7 @@ int main() {
 
     /* Check serial number */
     std::string expected_sn = SERIAL_NUMBER; // SERIAL_NUMBER может быть "free" или 12-значной строкой
-    std::string sn = getCameraSerialNumber();
+    std::string sn = "stub_sn"; // getCameraSerialNumber();
 
     syslog(LOG_NOTICE, "Expected serial number: %s", expected_sn.c_str());
 
