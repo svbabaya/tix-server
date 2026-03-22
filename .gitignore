@@ -5,6 +5,7 @@
 .target-makefrag
 *.eap
 .vscode
+.DS_Store
 
 # Prerequisites
 *.d

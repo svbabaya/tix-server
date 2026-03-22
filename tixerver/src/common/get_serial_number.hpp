@@ -4,11 +4,12 @@
 #include <axparameter.h>
 #include <glib.h>
 #include <string>
+#include <algorithm>
 
 /* 
 * Функция предназначена для получения серийного номера камеры с помощью
 * библиотеки axparameter SDK Axis, которая использует glib. Поэтому
-* makefile.axis подключаются обе библиотеки.
+* в makefile.axis подключаются обе библиотеки.
 */
 
 std::string getCameraSerialNumber() {
@@ -24,9 +25,11 @@ std::string getCameraSerialNumber() {
     std::string serial_number = "";
 
     // Получаем MAC-адрес (серийный номер в формате Axis)
-    if (ax_parameter_get(ax_param, "root.Network.I0.MACAddress", &raw_serial, &error)) {
+    if (ax_parameter_get(ax_param, "root.Network.eth0.MACAddress", &raw_serial, &error)) {
         if (raw_serial) {
             serial_number = raw_serial;
+            serial_number.erase(std::remove(serial_number.begin(), serial_number.end(), ':'), 
+                        serial_number.end());
             g_free(raw_serial); // Очистка памяти GLib
         }
     } else {

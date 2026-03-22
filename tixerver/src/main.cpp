@@ -28,24 +28,20 @@ int main() {
 
     /* Check serial number */
     std::string expected_sn = SERIAL_NUMBER; // SERIAL_NUMBER может быть "free" или 12-значной строкой
-    std::string sn = "stub_sn"; // getCameraSerialNumber();
-
-    syslog(LOG_NOTICE, "Expected serial number: %s", expected_sn.c_str());
-
-    if (sn.empty()) {
-        syslog(LOG_WARNING, "The app %s can't read the camera's serial number and will be stopped!", APP_NAME_STR);
-        return 0;
-    }
-
-    syslog(LOG_NOTICE, "Actual serial number: %s", sn.c_str());
-
-    if (expected_sn != "free" && sn != expected_sn) {
-        syslog(LOG_WARNING, "The app %s is not intended for this camera and will be stopped!", APP_NAME_STR);
-        return 0;
+    if (expected_sn != "free") {
+        std::string sn = getCameraSerialNumber();
+        // syslog(LOG_NOTICE, "Expected serial number: %s", expected_sn.c_str());
+        if (sn.empty()) {
+            syslog(LOG_WARNING, "The app %s can't read the camera's serial number and will be stopped!", APP_NAME_STR);
+            return 0;
+        }
+        // syslog(LOG_NOTICE, "Actual serial number: %s", sn.c_str());
+        if (sn != expected_sn) {
+            syslog(LOG_WARNING, "The app %s is not intended for this camera and will be stopped!", APP_NAME_STR);
+            return 0;
+        }
     }
     /* end Check serial number */
-
-    syslog(LOG_NOTICE, "Serial number verified. Starting application...");
 
      // 1. Инициализация libevent
     struct event_base* base = event_base_new();
