@@ -7,23 +7,40 @@
 
 
 20. Для запуска компиляции с помощью make и создания пакета загрузки на камеру (.eap) используется
-скрипт с ключами, обозначающими архитектуру процессора камеры ($ create-package.sh {mipsisa32r2el | armv7hf}). На основе этого ключа скрипт выбирает нужный toolchain.
-После компиляции скрипт создает пакет .eap в который помимо исполняемого файла включаются дополнительные файлы,
-указанные в package.conf. В новой версии проекта traffixtream предусмотрено использование отдельных makefile для разных типов камер: makefile.axis, makefile.dahua, makefile.hik и для того, чтобы create-package.sh мог работать, необходимо сделать его корректировку, поскольку скрипт по умолчанию использует именно makefile.
-Кроме того, нужно обеспечить возможность передачи серийного номера камеры в код перед компиляцией и сообщать коду под какую архитектуру будет производиться компиляция, поскольку от выбора архитектуры зависит подключение и отключение некоторых фрагментов кода.
-Решение:
+скрипт с ключами, обозначающими архитектуру процессора камеры ($ create-package.sh {mipsisa32r2el | armv7hf}). На основе этого ключа скрипт выбирает нужный toolchain. Обратите внимание, что хотя скрипт и toolchain расчитаны для работы с другими архитектурами, этом проекте все настройки сделаны только для mipsisa32r2el и armv7hf.
 
-- Находим **create-package.sh** в директории SDK: {your_home_dir}/axis/emb-app-sdk_2_0_3/tools/scripts и открываем в текстовом редакторе:
+После компиляции скрипт создает пакет .eap (это архив tar) в который помимо исполняемого файла включаются файлы,
+указанные в package.conf. 
+
+В этой версии проекта traffixtream используются отдельные makefile для разных типов камер: makefile.axis, makefile.dahua, makefile.hik и для того, чтобы create-package.sh мог с ними работать, а также принимать дополнительный параметр (серийный номер), необходимо сделать корректировку основного скрипта create-package.sh, а также вспомогательного.
+
+Скрипты находим в директории SDK Axis(это путь по умолчанию):
+{your_home_dir_in_virtual_mashine}/axis/emb-app-sdk_2_0_3/tools/scripts
+
+В директории **sh** проекта есть исправленные версии обоих скриптов, можно просто скопировать их в директорию scripts, а можно внести изменения самостоятельно на основе дальнейших инструкций.
+
+- Открываем **create-package.sh** в текстовом редакторе:
 `$ nano create-package.sh`
 
-- Перед строкой `for target in $TARGETS ; do...` вставляем блок, который считывает дополнительный аргумент
-и производит валидацию по правилу: второй аргумент это либо free, либо 12-значное 16-ричное число без пробелов. Если второго аргумента нет, то по умолчанию это free.
+- Меняем первую строчку скрипта (Shebang)
+Было: `#!/bin/sh -e`
+Стало: `#!/bin/bash -e`
+Это необходимо, поскольку синтаксис [[ ]], использованный далее, не работает в sh.
+
+- Перед строками
 ```
+# The chip names are allowed as targets for backward compatability.
+for target in $TARGETS ; do
+```
+вставляем блок, который считывает дополнительный аргумент (серийный номер)
+и производит валидацию по правилу:  второй аргумент это либо free, 
+либо 12-значное 16-ричное число без пробелов. Если второго аргумента нет,
+то по умолчанию это free:
+```
+### New code
 # Обработка и валидация SN перед циклом
 RAW_SN="${2:-free}" # Если пусто — free
-RAW_SN="${RAW_SN#*=}" # Убираем "SN=", если оно было введено
 SN=$(echo "$RAW_SN" | tr '[:lower:]' '[:upper:]') # В верхний регистр
-
 # Валидация: только "FREE" или 12 символов HEX
 if [[ "$SN" != "FREE" ]] && [[ ! "$SN" =~ ^[0-9A-F]{12}$ ]]; then
     printf "Error: Invalid Serial Number '$2'\n"
@@ -31,14 +48,13 @@ if [[ "$SN" != "FREE" ]] && [[ ! "$SN" =~ ^[0-9A-F]{12}$ ]]; then
     help
     exit 1
 fi
-
-# Если валидация пройдена, оставляем маленькими буквами только слово free 
+# Если валидация пройдена, оставляем маленькими буквами только слово free
 [ "$SN" = "FREE" ] && SN="free"
+### end New code
 ```
 
-- Далее по коду находим два вызова make:
+- Далее находим блок:
 ```
-...
 \printf "make $TARGET"
         \make $TARGET
         \printf "make"
@@ -46,29 +62,84 @@ fi
                 croak "make failed. Please fix above errors, before you can create a package"
                 exit 1
         }
-...
+        \command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET || `dirname $0`/eap-create.sh $TARGET
 ```
-
-- Корректируем вызовы make и вывод информации printf:
+И меняем его на:
 ```
-...     
-\printf "make -f makefile.axis $target TARGET=$target SN=$SN\n"
-        \make -f makefile.axis $target TARGET=$target SN=$SN
-        \printf "make -f makefile.axis TARGET=$target SN=$SN\n"
-        \make -f makefile.axis TARGET=$target SN=$SN || {
+### New version
+\printf "make -f makefile.axis TARGET=$TARGET SN=$SN\n"
+        \make -f makefile.axis TARGET=$TARGET SN=$SN || {
                 croak "make failed. Please fix above errors, before you can create a package"
                 exit 1
         }
-  
-...
+\command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET "$SN" || `dirname $0`/eap-create.sh $TARGET "$SN"
+### end New version
 ```
-Комментарии:
-Первый make вызывает специфичный таргет архитектуры, второй вызывает сборку.
-\-f makefile.axis: Это позволяет использовать makefile.axis вместо стандартного makefile
-TARGET=$target: Передает полное имя архитектуры (например, mipsisa32r2el-axis-linux-gnu) внутрь makefile.axis 
-SN=$SN: Передает в makefile.axis значение SN
+Теперь в makefile.axis будут передаваться два параметра: TARGET (архитектура) и SN(серийный номер).
+Они же передаются в скрипт eap-create.sh
+
 - Сохраняем изменения
-- Открываем **makefile.axis** и формируем макрос ARCH на основе переданной из скрипта архитектуры:
+- Открываем **eap-create.sh** в текстовом редакторе:
+`$ nano eap-create.sh`
+- Перед определением функции doMakeTheTar() добавляем переменную SN_PARAM, которой присваивается 
+значение второго параметра скрипта (серийный номер), а внутри функции doMakeTheTar() меняем код 
+в выделенной области:
+```
+SN_PARAM="$2"
+doMakeTheTar() {
+	local tarb
+
+	# Create the name of the file.
+	tarb=$(echo "$PACKAGENAME" | \sed 's/ /_/g')
+	if [ "$APPMAJORVERSION" ] && [ "$APPMINORVERSION" ]; then
+		tarb=${tarb}_${APPMAJORVERSION}_$APPMINORVERSION
+		[ -z "$APPMICROVERSION" ] || tarb=${tarb}-$APPMICROVERSION
+	fi
+
+### Old version
+	# if [ -z $APPTYPE ]; then
+	# 	 tarb=$tarb.eap
+	# else
+	#	 tarb=${tarb}_$APPTYPE.eap
+	# fi
+### end Old version
+
+### New version
+	# Добавляем архитектуру
+        if [ -n "$APPTYPE" ]; then
+                tarb="${tarb}_${APPTYPE}"
+        fi
+        # Добавляем серийный номер В САМОМ КОНЦЕ
+        if [ -n "$SN_PARAM" ]; then
+                tarb="${tarb}_${SN_PARAM}"
+        fi
+        # Добавляем расширение
+        tarb="${tarb}.eap"
+### end New version
+
+	LUAPKGFILES=
+        # ... остальной код функции
+}
+```
+- Сохраняем изменения
+
+Теперь использовать скрипт для компиляции и создания пакета .eap нужно так:
+```
+$ create-package.sh mipsisa32r2el 00408CE36579
+$ create-package.sh armv7hf free
+$ create-package.sh armv7hf 00408CE86871
+$ create-package.sh mipsisa32r2el // по умолчанию в makefile.axis будет передан SN=free
+```
+В результате будут создаваться пакеты похожего формата:
+```
+TiXerver_1_0-1_mipsisa32r2el_00408CE86871.eap
+TiXerver_1_0-1_armv7hf_free.eap
+```
+Название приложения и версию скрипт берет из файла package.conf
+
+Обратите внимание, что в **makefile.axis** на основе TARGET, полученного из скрипта create-package.sh
+создается макрос ARCH со значениями MIPS или ARMV7HF, которые используются для подключения специфических 
+исходников и библиотек:
 ```
 ifeq ($(TARGET), mipsisa32r2el-axis-linux-gnu)
     ARCH = MIPS
@@ -76,59 +147,3 @@ else ifeq ($(TARGET), armv7-axis-linux-gnueabihf)
     ARCH = ARMV7HF
 endif
 ```
-
-- Пример использования скрипта:
-$ create-package.sh mipsisa32r2el free
-$ create-package.sh armv7hf free
-$ create-package.sh armv7hf 00408CE86871
-$ create-package.sh mipsisa32r2el // по умолчанию в makefile.axis будет передан SN=free
-
-### Дополнительная информация:
-- При запуске create-package.sh возможна ошибка `Bad substitution` и другие из-за того, что синтаксис [[ ]] и ${@:2} поддерживается в Bash, но недопустим в стандартном sh/dash. Чтобы исправить ситуацию, либо запускаем скрипт через bash: `$ bash create-package.sh armv7hf free`,
-либо меняем первую строчку скрипта (Shebang):
-Было: `#!/bin/sh -e`
-Стало: `#!/bin/bash -e`
-
-- Чтобы серийный номер был включен в имя eap-пакета, открываем в редакторе скрипт **create-package.sh** и добавляем еще один аргумент при вызове скрипта **eap-create.sh**, а именно:
-1.1 Меняем строку:
-`\command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET || `dirname $0`/eap-create.sh $TARGET`
-на
-`\command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET "$SN" || `dirname $0`/eap-create.sh $TARGET "$SN"`
-
-1.2 Открываем **eap-create.sh**
-
-1.3 Перед определением функции **doMakeTheTar()** добавляем переменную SN_PARAM, которая принимает второй параметр,
-а внутри функции **doMakeTheTar()** меняем код в выделенной области:
-```
-SN_PARAM="$2"
-doMakeTheTar() {
-        local tarb
-#----------------------------------------
-        # 1. Формируем базу: Имя + Версия
-        tarb=$(echo "$PACKAGENAME" | \sed 's/ /_/g')
-        if [ "$APPMAJORVERSION" ] && [ "$APPMINORVERSION" ]; then
-                tarb=${tarb}_${APPMAJORVERSION}_$APPMINORVERSION
-                [ -z "$APPMICROVERSION" ] || tarb=${tarb}-$APPMICROVERSION
-        fi
-
-        # 2. Добавляем архитектуру (если есть)
-        if [ -n "$APPTYPE" ]; then
-                tarb="${tarb}_${APPTYPE}"
-        fi
-
-        # 3. Добавляем серийный номер В САМОМ КОНЦЕ
-        if [ -n "$SN_PARAM" ]; then
-                tarb="${tarb}_${SN_PARAM}"
-        fi
-
-        # 4. Добавляем расширение
-        tarb="${tarb}.eap"
-#----------------------------------------
-        LUAPKGFILES=
-        # ... остальной код функции
-}
-```
-Теперь пакет будет выглядеть так:
-TiXerver_1_0-1_mipsisa32r2el_00408CE86871.eap
-TiXerver_1_0-1_armv7hf_free.eap
-Название приложения и версию скрипт берет из файла package.conf
