@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 ##############################################################################
 #
 # FILE NAME  : create-package.sh
@@ -55,6 +55,21 @@ else
 	done
 fi
 
+### New code
+# Обработка и валидация SN перед циклом
+RAW_SN="${2:-free}" # Если пусто — free
+SN=$(echo "$RAW_SN" | tr '[:lower:]' '[:upper:]') # В верхний регистр
+# Валидация: только "FREE" или 12 символов HEX
+if [[ "$SN" != "FREE" ]] && [[ ! "$SN" =~ ^[0-9A-F]{12}$ ]]; then
+    printf "Error: Invalid Serial Number '$2'\n"
+    printf "SN must be 'free' or a 12-digit hex string (e.g. 00408CE86871)\n"
+    help
+    exit 1
+fi
+# Если валидация пройдена, оставляем маленькими буквами только слово free
+[ "$SN" = "FREE" ] && SN="free"
+### end New code
+
 # The chip names are allowed as targets for backward compatability.
 for target in $TARGETS ; do
 	case "$target" in
@@ -82,14 +97,29 @@ for target in $TARGETS ; do
 			exit 1
 			;;
 	esac
-	\printf "make $TARGET"
-	\make $TARGET
-	\printf "make"
-	\make || {
-		croak "make failed. Please fix above errors, before you can create a package"
-		exit 1
+
+### Old version
+	# \printf "make $TARGET"
+	# \make $TARGET
+	# \printf "make"
+	# \make || {
+	#	 croak "make failed. Please fix above errors, before you can create a package"
+	#	 exit 1
+	# }
+
+### New version
+	\printf "make -f makefile.axis TARGET=$TARGET SN=$SN\n"
+	\make -f makefile.axis TARGET=$TARGET SN=$SN || {
+    	croak "make failed. Please fix above errors, before you can create a package"
+    	exit 1
 	}
-	\command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET || `dirname $0`/eap-create.sh $TARGET
+
+### Old version
+	# \command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET || `dirname $0`/eap-create.sh $TARGET
+
+### New version
+	\command -v eap-create.sh > /dev/null 2>&1 && \eap-create.sh $TARGET "$SN" || `dirname $0`/eap-create.sh $TARGET "$SN"
+
 done
 
 exit 0

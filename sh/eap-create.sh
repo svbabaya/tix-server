@@ -128,6 +128,8 @@ luaCleanupGenFiles() {
 }
 
 ############################################################
+### Серийный номер из второго аргумента скрипта
+SN_PARAM="$2"
 doMakeTheTar() {
 	local tarb
 
@@ -138,11 +140,26 @@ doMakeTheTar() {
 		[ -z "$APPMICROVERSION" ] || tarb=${tarb}-$APPMICROVERSION
 	fi
 
-	if [ -z $APPTYPE ]; then
-		tarb=$tarb.eap
-	else
-		tarb=${tarb}_$APPTYPE.eap
-	fi
+### Old version
+	# if [ -z $APPTYPE ]; then
+	# 	 tarb=$tarb.eap
+	# else
+	#	 tarb=${tarb}_$APPTYPE.eap
+	# fi
+### end Old version
+
+### New version
+	# Добавляем архитектуру
+    if [ -n "$APPTYPE" ]; then
+        tarb="${tarb}_${APPTYPE}"
+    fi
+    # Добавляем серийный номер В САМОМ КОНЦЕ
+    if [ -n "$SN_PARAM" ]; then
+        tarb="${tarb}_${SN_PARAM}"
+    fi
+    # Добавляем расширение
+    tarb="${tarb}.eap"
+### end New version
 
 	LUAPKGFILES=
 	[ "$LUAFILES" ] || [ "$LUAFILESENCRYPTED" ] && luaSetLuaPgkFiles
@@ -150,6 +167,7 @@ doMakeTheTar() {
 	\printf "Creating Package: '$tarb'... "
 	[ ! -r $tarb ] || \mv -f $tarb $tarb.old
 
+### New tar format 
 	\tar czf $tarb --exclude="*~" --exclude="CVS" --format=gnu $APPNAME $ADPPACKCFG $ADPPACKPARAMCFG \
 		$POSTINSTALLSCRIPT $OTHERFILES $HTTPD_CONF_LOCAL_FILES \
 		$HTTPD_MIME_LOCAL_FILES $HTMLDIR $EVENT_DECLS_DIR $LIBDIR \

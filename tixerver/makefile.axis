@@ -8,7 +8,8 @@
 # $ create-package.sh mipsisa32r2el 00408CE86871
 # $ create-package.sh armv7hf free
 # $ create-package.sh armv7hf 00408CE67850
-# 
+
+
 
 # ToDo Убрать возможность такой сборки, оставить только для значений по умолчанию ARCH=MIPS, SN=free
 # Запускать сборку напрямую с помощью makefile.axis можно если ранее уже запускался create-package.sh 
@@ -17,6 +18,8 @@
 # Примеры:
 # make -f makefile.axis ARCH=MIPS SN=00408C123456 clean release
 # make -f makefile.axis ARCH=MIPS SN=free clean release
+
+
 
 # APP_NAME_STR - название приложения из package.conf
 # APP_VER_STR - версия приложения из package.conf
