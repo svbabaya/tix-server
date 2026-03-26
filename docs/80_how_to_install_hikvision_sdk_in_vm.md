@@ -2,10 +2,9 @@
 Установка Hikvision SDK в WSL (Windows) или LiMa (Mac OS). Подходит для установки в различных сборках Linux.
 В документе "HEOP2.0_Developer Guide.pdf" установка Docker рассчитана на старые версии Ubuntu и выглядит немного иначе.
 
-SDK Hikvision загружается как docker image, поэтому один из возможных вариантов дальнейших действий в MacOs, где ранее уже была установлен LiMa, использовать Colima (Containers on Lima) - инструмент с открытым исходным кодом, который позволяет запускать контейнеры Docker и Kubernetes на macOS (и Linux), альтернатива Docker Desktop.
-Colima использует Lima как основу, добавляя к нему удобный интерфейс для работы с контейнерами.
+SDK Hikvision загружается как docker image, поэтому один из возможных вариантов дальнейших действий в MacOs, где ранее уже была установлен LiMa, использовать Colima (Containers on Lima) - инструмент с открытым исходным кодом, который позволяет запускать контейнеры Docker и Kubernetes на macOS (и Linux), альтернатива Docker Desktop. Colima использует Lima как основу, добавляя к нему удобный интерфейс для работы с контейнерами.
 
-Обратите внимание, что при использовании Colima значительная часть действий из руководства не потребуется, поскольку Colima берет их на себя по умолчанию (создание виртуальной машины в LiMa с предустановленным Docker, настроенными ключами и репозиторием). Действия при установке SDK на чистой системе приведены в конце этого документа.
+Обратите внимание, что при использовании Colima значительная часть действий из руководства не потребуется, поскольку Colima берет их на себя по умолчанию (создание виртуальной машины в LiMa с предустановленным Docker, настроенными ключами и репозиторием). Действия при установке SDK на чистый Ubuntu сервер приведены в конце этого документа.
 
 - В системе должен быть установлен LiMa (06_how_to)
 - Устанавливаем Colima (из командной строки MacOs):
@@ -79,13 +78,115 @@ Password: ...
 При успешной авторизации появится сообщение `Login Succeeded`
 - Скачиваем image:
 ```
-docker pull 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
+$ docker pull 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
 ```
-!!! Пока не закачивается
+
+
+/??????
+- После скачивания появится информация:
+```
+Digest: sha256:c1f43eb9f5a6625437e1774f420ef7ae6ec37491f93ef132d11636d99a54848b
+Status: Downloaded newer image for 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
+13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
+```
+Image можно увидеть по команде:
+```
+$ docker images
+IMAGE                                                    ID             DISK USAGE   CONTENT SIZE
+13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240  f0785bc2711b   13.8GB       0B
+```
+Но при этом нужно знать в каком контексте вы находитесь, поскольку если у вас установлен Docker Desktop, Docker внутри LiMa, Docker как Colima, эта команда покажет разную информацию в зависимости от того, какой Docker активен в данный момент. Docker CLI — это просто "пульт", который подключается к активному демону (Docker Engine). Где находится этот демон — туда и смотрит команда.
+- Проверяем какой демон активен (отмечен *):
+```
+$ docker context ls
+NAME              DESCRIPTION                               DOCKER ENDPOINT
+colima            colima                                    unix:///Users/sergebabayan/.colima/default/docker.sock
+default           Current DOCKER_HOST based configuration   unix:///var/run/docker.sock
+desktop-linux *   Docker Desktop                            unix:///Users/sergebabayan/.docker/run/docker.sock
+```
+Кстати, удалить контекст можно так: `$ docker context rm {NAME}`
+
+- Переключаемся на контекст Colima: `docker context use colima` или `colima start` если Colima ранее была остановлена.
+
+### Как перенести образ из Docker MacOs в Colima
+- Переключаем контекст на Docker Desktop
+```
+$ docker context use desktop-linux
+```
+- Архивируем нужный образ:
+```
+$ docker save -o ~/Desktop/hikvision-sdk.tar 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
+```
+- Запускаем Colima:
+```
+$ colima start
+```
+- Загружаем образ в Colima:
+```
+$ docker load -i ~/Desktop/hikvision-sdk.tar
+```
+В тоге должно появиться сообщение:
+```
+Loaded image: 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
+```
+### Далее можно работать с SDK
+
+Запускаем контейнер из этого образа:
+```
+$ docker run -it --user root --entrypoint /bin/sh 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
+```
+В результате должно появиться приглашение Linux:
+```
+sh-5.0# 
+```
+Далее знакомимся с SDK
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+### Информация Docker - LiMa - Colima
+Docker Desktop
+├── Docker CLI (на macOS)
+└── Linux VM (скрытая, создаётся Docker Desktop)
+    └── Docker Engine
+
+Colima
+├── Docker CLI (на macOS, тот же самый)
+└── Lima VM (создаётся Colima)
+    └── Docker Engine (устанавливается Colima внутри VM)
+
+
+┌────────────────────────────────────────────────────────┐
+│                      macOS                             │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │              Docker CLI (клиент)                │   │
+│  │         (команда docker из Homebrew)            │   │
+│  └─────────────────────────────────────────────────┘   │
+│                         │                              │
+│                         │ подключение                  │
+│                         ▼                              │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │              Lima (виртуализация)               │   │
+│  │  ┌─────────────────────────────────────────┐    │   │
+│  │  │      Виртуальная машина Linux           │    │   │
+│  │  │  ┌───────────────────────────────────┐  │    │   │
+│  │  │  │   Docker Engine (демон)           │  │    │   │
+│  │  │  │   dockerd                         │  │    │   │
+│  │  │  └───────────────────────────────────┘  │    │   │
+│  │  └─────────────────────────────────────────┘    │   │
+│  └─────────────────────────────────────────────────┘   │
+└────────────────────────────────────────────────────────┘
 
 
 
@@ -113,17 +214,20 @@ $ docker load -i hikvision-sdk.tar.gz
 ```
 - Смонтировать локальную папку для работы с проектами:
 ```
-docker run -it -v /Users/ваше_имя/projects:/workspace 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240 bash
+$ docker run -it -v /Users/ваше_имя/projects:/workspace 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240 bash
 ```
 - Создать alias для удобного запуска:
 ```
-alias hik-sdk='docker run -it -v $(pwd):/workspace 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240'
+$ alias hik-sdk='docker run -it -v $(pwd):/workspace 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240'
+```
+- Узнать архитектуру image:
+```
+$ docker inspect 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240 | grep Architecture
 ```
 
 
 
-
-
+### First version
 ### 1. Устанавливаем Docker в Linux (wsl или lima)
 1.1 Добавляем ключ Docker
 ```
