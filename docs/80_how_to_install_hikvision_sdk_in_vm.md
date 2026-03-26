@@ -130,7 +130,6 @@ $ docker load -i ~/Desktop/hikvision-sdk.tar
 Loaded image: 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
 ```
 ### Далее можно работать с SDK
-
 Запускаем контейнер из этого образа:
 ```
 $ docker run -it --user root --entrypoint /bin/sh 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
@@ -139,10 +138,19 @@ $ docker run -it --user root --entrypoint /bin/sh 13.251.8.106/docker-global-pro
 ```
 sh-5.0# 
 ```
-Далее знакомимся с SDK
+Далее знакомимся с SDK. В директории /heop находятся: /heop/demo, /heop/include, /heop/lib, /heop/libversion, /heop/nginx, /heop/workspace
+```
+В директорию workspace нужно будет смонтировать корневую директорию проекта, находящегося в MacOs.
 
-
-
+sh-5.0# echo $PATH
+/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+sh-5.0# echo $LD_LIBRARY_PATH
+/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+```
+Выйти из контейнера:
+```
+sh-5.0# exit
+```
 
 
 
