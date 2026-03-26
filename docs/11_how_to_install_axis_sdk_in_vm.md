@@ -1,11 +1,62 @@
 ## How to install and use Axis SDK in Virtual Mashine
 Установка Axis SDK в WSL (Windows) или LiMa (Mac OS). Подходит для установки в различных сборках Linux.
 
-1. Установка виртуальной машины
+### 1. Установка тулчейна и окружения SDK Axis
+Axis SDK v2 упакован в архив AXIS_Embedded_Development_SDK_2_0_3.tar.gz, скопируем его в домашнюю директорию виртуальной машины "~" (в LiMa это /home/{your_user_name}).
+- Распакуем архив:
+```
+$ tar -xvzf AXIS_Embedded_Development_SDK_2_0_3.tar.gz
+```
+- В результате в то же директории появится файл `install-sdk-2_0_3.bin`, установим для него permissions на исполнение:
+```
+$ chmod +x install-sdk-2_0_3.bin
+``` 
+- Запустим .bin
+```
+$ ./install-sdk-2_0_3.bin
+```
+В результате в домашней директории появится директория **axis**
+- Заходим в axis/emb-app-sdk_2_0_3/tools/compilers, здесь три директории: arm, armhf, mips. Внутри каждой находится файл .deb, то есть дистрибутив тулчейна под определенную архитектуру камеры. Поочередно заходим в каждую из этих директорий и запускаем установку дистрибутивов. Пример для mips:
+```
+$ sudo dpkg -i comptools-arm-r21_1.21-1_amd64.deb
+```
+Тулчейны по умолчанию устанавливаются в системную директорию /usr/local в отдельные директории arm, armhf и mipsisa32r2el. В этих директориях находятся кросскомпиляторы и вспомогательные утилиты для сборки и отладки исполняемого файла под соответствующую архитектуру.
+- Заходим в ~/axis/emb-app-sdk_2_0_3, здесь должен быть скрипт **init_env**, который настраивает окружение для работы тулчейнов. Запускаем скрипт:
+```
+$ source init_env
+```
+Если все в порядке, вы увидите такие сообщения:
+```
+Using compiler "/usr/local/mipsisa32r2el/r23/bin/mipsisa32r2el-axis-linux-gnu-gcc" (revision "23").
 
+Found arm-axis-linux-gnueabi-gcc r21
+Using compiler "/usr/local/arm/r21/bin/arm-axis-linux-gnueabi-gcc" (revision "21").
 
+Found arm-axis-linux-gnueabihf-gcc r27
+Using compiler "/usr/local/armhf/r27/bin/arm-axis-linux-gnueabihf-gcc" (revision "27").
 
-20. Для запуска компиляции с помощью make и создания пакета загрузки на камеру (.eap) используется
+Prepending "/home/sergebabayan.linux/axis/emb-app-sdk_2_0_3/tools/bin" to PATH.
+Prepending "/home/sergebabayan.linux/axis/emb-app-sdk_2_0_3/tools/scripts" to PATH.
+
+Setting PKG_CONFIG_PATH.
+
+Detected x86_64 host
+'host/host-x86_64' -> 'host-x86_64'
+```
+Если вы распаковали SDK не в домашней, а где-нибудь в системной директории, например в /usr/local и при этом init_env не запускается, возможно нужно дать разрешение на запись для процессов, которые запускает init_env. Проще всего это сделать сменой владельца директории emb-app-sdk_2_0_3:
+```
+$ sudo chown -R {your_user_name}:{your_group_name} /usr/local/axis/emb-app-sdk_2_0_3/
+```
+Важно помнить, что каждый раз после загрузки операционной системы вам нужно открыть терминал, выполнить `$ source init_env` и только потом, в том же окне вызывать скрипт create-package.sh, который запускает компиляцию и сборку с помощью make, а потом запускает создание пакета .eap для загрузки на камеру.
+
+### 2. Установка make
+В этом проекте для сборки под Axis используется make, он должен быть установлен в вашей вируальной машине:
+```
+$ sudo apt install make
+```
+
+### 3. Настройка скриптов Axis SDK
+Для запуска компиляции с помощью make и создания пакета загрузки на камеру (.eap) используется
 скрипт с ключами, обозначающими архитектуру процессора камеры ($ create-package.sh {mipsisa32r2el | armv7hf}). На основе этого ключа скрипт выбирает нужный toolchain. Обратите внимание, что хотя скрипт и toolchain расчитаны для работы с другими архитектурами, этом проекте все настройки сделаны только для mipsisa32r2el и armv7hf.
 
 После компиляции скрипт создает пакет .eap (это архив tar) в который помимо исполняемого файла включаются файлы,
@@ -120,25 +171,49 @@ doMakeTheTar() {
         # ... остальной код функции
 }
 ```
+- Пока eap-install.sh открыт в текстовом редакторе, можно внести еще одно изменение.
+В скрипте eap-install.sh для создания пакета .eap вызывается утилита tar, а поскольку оригинальный скрипт написан для устаревшей версии SDK, то в нем используется устаревший синтаксис tar. Если вы используете современную версию Linux, то без коррекции скорее всего увидите примерно такую ошибку:
+```
+Creating Package: 'TraffiXtreamS_3_0-2_mipsisa32r2el.eap'... tar: The following options were used after non-option arguments.  These options are positional and affect only arguments that follow them.  Please, rearrange them properly.
+tar: --exclude '*~' has no effect
+tar: --exclude 'CVS' has no effect
+tar: Exiting with failure status due to previous errors
+failed
+``` 
+Чтобы ее избежать, находим вызов tar в eap-install.sh и меняем положение ключей.
+Было:
+```
+\tar czf $tarb $APPNAME $ADPPACKCFG $ADPPACKPARAMCFG \
+	$POSTINSTALLSCRIPT $OTHERFILES $HTTPD_CONF_LOCAL_FILES \
+	$HTTPD_MIME_LOCAL_FILES $HTMLDIR $EVENT_DECLS_DIR $LIBDIR \
+	$LUAPKGFILES $HTTPCGIPATHS --exclude="*~" --exclude="CVS" --format=gnu || {
+```
+Стало:
+```
+\tar czf $tarb --exclude="*~" --exclude="CVS" --format=gnu $APPNAME $ADPPACKCFG $ADPPACKPARAMCFG \
+	$POSTINSTALLSCRIPT $OTHERFILES $HTTPD_CONF_LOCAL_FILES \
+	$HTTPD_MIME_LOCAL_FILES $HTMLDIR $EVENT_DECLS_DIR $LIBDIR \
+	$LUAPKGFILES $HTTPCGIPATHS || {
+```
 - Сохраняем изменения
 
-Теперь использовать скрипт для компиляции и создания пакета .eap нужно так:
+Для компиляции и создания пакета .eap можно делать так:
 ```
 $ create-package.sh mipsisa32r2el 00408CE36579
-$ create-package.sh armv7hf free
+$ create-package.sh armv7hf free // Сборка не привязана к определенной камере
 $ create-package.sh armv7hf 00408CE86871
 $ create-package.sh mipsisa32r2el // по умолчанию в makefile.axis будет передан SN=free
 ```
-В результате будут создаваться пакеты похожего формата:
+В результате будут созданы пакеты:
 ```
-TiXerver_1_0-1_mipsisa32r2el_00408CE86871.eap
+TiXerver_1_0-1_mipsisa32r2el_00408CE36579.eap
 TiXerver_1_0-1_armv7hf_free.eap
+TiXerver_1_0-1_armv7hf_00408CE86871.eap
+TiXerver_1_0-1_mipsisa32r2el_free.eap
 ```
 Название приложения и версию скрипт берет из файла package.conf
 
-Обратите внимание, что в **makefile.axis** на основе TARGET, полученного из скрипта create-package.sh
-создается макрос ARCH со значениями MIPS или ARMV7HF, которые используются для подключения специфических 
-исходников и библиотек:
+Обратите внимание, что в **makefile.axis** на основе TARGET, полученного из скрипта create-package.sh создается макрос ARCH со значениями MIPS или ARMV7HF, которые используются для подключения специфических исходников и библиотек:
 ```
 ifeq ($(TARGET), mipsisa32r2el-axis-linux-gnu)
     ARCH = MIPS

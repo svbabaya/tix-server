@@ -3,7 +3,7 @@
 В документе "HEOP2.0_Developer Guide.pdf" установка Docker расчитана на старые версии Ubuntu и выглядит немного иначе.
 
 ### 1. Устанавливаем Docker в Linux (wsl или lima)
-1.1 Добляем ключ Docker
+1.1 Добавляем ключ Docker
 ```
 $ sudo mkdir -p /etc/apt/keyrings
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -96,6 +96,7 @@ Password: ...
 ```
 $ sudo docker pull 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_2507080240
 ```
+После этого должна начаться загрузка, которая может занять длительное время.
 
 Когда образ будет загружен, появится примерно такое сообщение:
 ```
@@ -105,3 +106,25 @@ Status: Downloaded newer image for 13.251.8.106/docker-global-prod/g5/v2.3.0:G5_
 ```
 
 Командой `$ sudo docker images` можно проверить, что image успешно установлен.
+
+### 3. Копируем скрипт heop_devel_run.sh
+
+- Загрузите скрипт «heop_devel_run.sh» из архива "G5 HEOP Developer Materials.zip" в корневую директорию проекта
+- Добавьте разрешение на исполнение `$ sudo chmod +x heop_devel_run.sh`
+
+Этот скрипт нужно запускать перед сборкой приложения `$ sudo ./heop_devel_run.sh -r`
+
+### Информация о скрипте
+
+Скрипт создает и запускает Docker контейнер с HEOP окружением для разработки приложений под камеры Hikvision (PSH firmware).
+
+При первом запуске:
+- Скрипт проверит наличие Docker
+- Создаст директорию ~/heop_devel_kit для хранения данных
+- Монтирует локальную директорию (VOLUME_PATH) в /heop/workspace внутри контейнера: запросит путь для volume (где будут храниться наши файлы). Нажимаем Enter для использования пути по умолчанию: ~/heop_devel_kit/volume но лучше вводим свой путь:
+```
+Please enter your volume path(user data path)[enter means uses default value /home/user/heop_devel_kit/volume]:
+/Users/sergebabayan/vscode-workspace/tix-server/tixerver
+```
+- Покажет список доступных Docker образов HEOP и попросит выбрать
+- Запустит контейнер со смонтированной директорией
