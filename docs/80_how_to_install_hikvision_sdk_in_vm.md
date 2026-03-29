@@ -505,18 +505,27 @@ enter your choose:
 ```
 - Первый способ - заменить функцию select_image() на этот вариант:
 ```
-function select_image(){
-    images=`docker images | awk 'BEGIN{i=1} {if (NR>1) printf("[%4d] %s %s %s %s %s\n",i++,$1,$2,$3,$4,$5)}'`
-    info "select heop_devel_kit image to run:\n$images"
-    read -p "enter your choose:" index
+function select_image() {
+    # 1. Получаем список образов в чистом виде: "repository:tag"
+    local raw_images=$(docker images --format "{{.Repository}}:{{.Tag}}")
     
-    # Проверяем, является ли ввод числом
+    # 2. Формируем нумерованный список для отображения пользователю
+    local display_list=$(echo "$raw_images" | awk '{print "["NR"]", $1}')
+    
+    info "select heop_devel_kit image to run:\n$display_list"
+    read -p "enter your choose: " index
+    
+    # 3. Проверяем ввод
     if [[ "$index" =~ ^[0-9]+$ ]]; then
-        # Если число - выбираем по номеру
-        TARGET_IMAGE=`echo "$images" | awk -v idx="$index" 'NR==idx {printf("%s:%s\n",$2,$3)}'`
+        # Выбираем строку по номеру и берем только имя образа
+        TARGET_IMAGE=$(echo "$raw_images" | sed -n "${index}p")
     else
-        # Если не число - считаем что ввели имя образа
         TARGET_IMAGE="$index"
+    fi
+
+    # Если выбор оказался пустым (неверный индекс)
+    if [[ -z "$TARGET_IMAGE" ]]; then
+        err "Invalid selection. Please try again."
     fi
 }
 ```
@@ -539,6 +548,9 @@ import /etc/heop_devel_kit.rc/app.rc
 import /etc/heop_devel_kit.rc/dsp.rc
 root@dbcbe30473ce:/heop/workspace# 
 ```
+
+
+
 - Теперь мы внутри контейнера HEOP в директории /heop/workspace
 - Все изменения, которые мы сделаем здесь, будут видны в MacOs
 - Скомпилированный бинарник появится в папке проекта на MacOs

@@ -4,7 +4,7 @@ CXXFLAGS = -Wall -Wextra -O2
 LDFLAGS = 
 
 # Целевой файл
-TARGET = test_heop
+TARGET = tixcheck
 SOURCES = main.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
