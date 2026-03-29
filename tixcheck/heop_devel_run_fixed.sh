@@ -75,25 +75,55 @@ function check() {
 	
 }
 
+# Old version
+# function load_config() {
+# 	local vol_path
+# 	if [[ ! -e ${ROOT_DIR}/.config ]]; then
+# 		read -p "Please enter your volume path(user data path)[enter means uses default value ${DEFAULT_VOLUME_PATH}]:" vol_path
+# 		case ${vol_path} in
+# 			"")
+# 				VOLUME_PATH=${DEFAULT_VOLUME_PATH};;
+# 			*)
+# 				VOLUME_PATH=${vol_path};;
+# 		esac
+# 		echo "VOLUME_PATH = ${VOLUME_PATH}"
+# 		mkdir ${VOLUME_PATH} || err "create volume failed in ${VOLUME_PATH}"
+# 		echo "VOLUME_PATH=${VOLUME_PATH}" > ${ROOT_DIR}/.config
+# 	else
+# 		echo "found config file and load ...."
+# 		source ${ROOT_DIR}/.config
+# 		echo "VOLUME_PATH=${VOLUME_PATH}"
+# 	fi
+# 	chmod 777 ${VOLUME_PATH}
+# }
+
+# New version
 function load_config() {
-	local vol_path
-	if [[ ! -e ${ROOT_DIR}/.config ]]; then
-		read -p "Please enter your volume path(user data path)[enter means uses default value ${DEFAULT_VOLUME_PATH}]:" vol_path
-		case ${vol_path} in
-			"")
-				VOLUME_PATH=${DEFAULT_VOLUME_PATH};;
-			*)
-				VOLUME_PATH=${vol_path};;
-		esac
-		echo "VOLUME_PATH = ${VOLUME_PATH}"
-		mkdir ${VOLUME_PATH} || err "create volume failed in ${VOLUME_PATH}"
-		echo "VOLUME_PATH=${VOLUME_PATH}" > ${ROOT_DIR}/.config
-	else
-		echo "found config file and load ...."
-		source ${ROOT_DIR}/.config
-		echo "VOLUME_PATH=${VOLUME_PATH}"
-	fi
-	chmod 777 ${VOLUME_PATH}
+    # 1. Если конфиг есть, спрашиваем, оставить ли старый путь
+    if [[ -e ${ROOT_DIR}/.config ]]; then
+        source ${ROOT_DIR}/.config
+        echo -e "\033[33mFound existing VOLUME_PATH: ${VOLUME_PATH}\033[0m"
+        read -p "Do you want to use this path? [Y/n]: " choice
+        
+        # Если пользователь ввел 'n' или 'N', сбрасываем переменную
+        if [[ "$choice" == "n" || "$choice" == "N" ]]; then
+            unset VOLUME_PATH
+        fi
+    fi
+
+    # 2. Если пути нет (первый запуск ИЛИ пользователь отказался от старого)
+    if [[ -z "${VOLUME_PATH}" ]]; then
+        read -p "Please enter your volume path (user data path) [default ${DEFAULT_VOLUME_PATH}]: " vol_path
+        # Используем введенный путь или дефолтный, если нажали Enter
+        VOLUME_PATH=${vol_path:-$DEFAULT_VOLUME_PATH}
+        
+        # Сохраняем в конфиг (перезаписываем)
+        echo "VOLUME_PATH=${VOLUME_PATH}" > ${ROOT_DIR}/.config
+        mkdir -p "${VOLUME_PATH}" || err "Create volume failed in ${VOLUME_PATH}"
+    fi
+
+    echo "Using VOLUME_PATH: ${VOLUME_PATH}"
+    chmod 777 "${VOLUME_PATH}"
 }
 
 # Old version
