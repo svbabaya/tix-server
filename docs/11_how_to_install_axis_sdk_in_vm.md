@@ -72,11 +72,11 @@ sudo apt install make
 
 После компиляции скрипт создает пакет .eap (это архив tar) в который, помимо исполняемого файла, включаются файлы, указанные в package.conf. 
 
-В этой версии проекта traffixtream используются отдельные makefile для разных типов камер: makefile.axis, makefile.dahua, makefile.hik и для того, чтобы create-package.sh мог с ними работать, а также принимать дополнительный параметр (серийный номер), необходимо сделать корректировку основного скрипта create-package.sh, и вспомогательного eap-create.sh.
+В этой версии проекта traffixtream используются отдельные makefile для разных типов камер: makefile.axis, makefile.dahua, makefile.hik и для того, чтобы create-package.sh мог с ними работать, а также принимать дополнительный параметр (серийный номер), необходимо сделать корректировку основного скрипта create-package.sh, вспомогательного eap-create.sh и eap-install.sh.
 
 Скрипты находим в директории SDK Axis `{your_home_dir_in_linux}/axis/emb-app-sdk_2_0_3/tools/scripts`
 
-В директории **sh** проекта есть исправленные версии обоих скриптов, можете просто скопировать их в директорию scripts, а можете внести изменения самостоятельно на основе дальнейших инструкций.
+В директории **sh** проекта есть исправленные версии скриптов, можете просто скопировать их в директорию scripts, а можете внести изменения самостоятельно на основе дальнейших инструкций.
 
 - Открываем **create-package.sh** в любом текстовом редакторе, например так:
 ```
@@ -182,7 +182,7 @@ doMakeTheTar() {
         # ... остальной код функции
 }
 ```
-- Пока eap-install.sh открыт в текстовом редакторе, вносим еще одно изменение. В скрипте eap-install.sh для создания пакета .eap вызывается утилита tar, а поскольку оригинальный скрипт написан для устаревшей версии SDK, то в нем используется устаревший синтаксис tar. Если вы используете современную версию Linux, то без коррекции скорее всего увидите примерно похожую ошибку:
+- Пока eap-create.sh открыт в текстовом редакторе, вносим еще одно изменение. В скрипте eap-create.sh для создания пакета .eap вызывается утилита tar, а поскольку оригинальный скрипт написан для устаревшей версии SDK, то в нем используется устаревший синтаксис tar. Если вы используете современную версию Linux, то без коррекции скорее всего увидите примерно похожую ошибку:
 ```
 Creating Package: 'TraffiXtreamS_3_0-2_mipsisa32r2el.eap'... tar: The following options were used after non-option arguments.  These options are positional and affect only arguments that follow them.  Please, rearrange them properly.
 tar: --exclude '*~' has no effect
@@ -190,7 +190,7 @@ tar: --exclude 'CVS' has no effect
 tar: Exiting with failure status due to previous errors
 failed
 ``` 
-Ннаходим вызов tar в eap-install.sh и меняем положение ключей.
+Ннаходим вызов tar в eap-create.sh и меняем положение ключей.
 
 Было:
 ```
@@ -207,6 +207,38 @@ failed
 	$LUAPKGFILES $HTTPCGIPATHS || {
 ```
 - Сохраняем изменения
+- Открываем **eap-install.sh** в текстовом редакторе:
+```
+nano eap-install.sh
+```
+- Комментируем код со строки 349 по 368:
+```
+# if [ "$APPMAJORVERSION" -a "$APPMINORVERSION" ]; then
+	# 	if [ "$APPMICROVERSION" ]; then
+	# 		end="-${APPMICROVERSION}_$APPTYPE.eap"
+	# 	else
+	# 		end="_$APPTYPE.eap"
+	# 	fi
+	# 	name=${myeap%_?_?$end}
+	# 	version=$myeap
+	# 	version=${version#$name}
+	# 	version=${version#_}
+	# 	version=${version%$end}
+
+	# 	if [ "$version" != "${APPMAJORVERSION}_$APPMINORVERSION" ] && [ "$action" = install ]; then
+	# 		# Typically happens when the version is changed
+	# 		# and the eap file of the old version still is in
+	# 		# the directory.
+	# 		echo "$myeap doesn't match information in package.conf, skipping"
+	# 		continue
+	# 	fi
+	# fi
+```
+Это сделано для предотвращения ошибки, когда скрипт сравнивает имя пакета с версиями из package.conf. Эта ошибка не позволит загрузить пакет на камеру из командной строки.
+- Сохраняем изменения
+
+Исправленные версии скриптов в итоге должны оказаться в директории SDK Axis `{your_home_dir_in_linux}/axis/emb-app-sdk_2_0_3/tools/scripts`
+В директории **sh** проекта есть исправленные версии скриптов, можете просто скопировать их в scripts, а можете внести изменения самостоятельно как это показано выше.
 
 Теперь для компиляции и создания пакета .eap возможны такие варианты:
 ```
@@ -223,6 +255,8 @@ TiXerver_1_0-1_armv7hf_00408CE86871.eap
 TiXerver_1_0-1_mipsisa32r2el_free.eap
 ```
 Название приложения и версию скрипт берет из файла package.conf
+
+
 
 
 
